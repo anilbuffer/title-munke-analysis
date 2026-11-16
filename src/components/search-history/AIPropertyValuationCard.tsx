@@ -14,16 +14,29 @@ interface AIPropertyValuationCardProps {
   title?: string;
   description?: string;
   data?: unknown;
+  onOpenValuation?: () => void;
 }
 
 export function AIPropertyValuationCard({
   title = 'AI Property Valuation Engine',
   description = 'Automated valuation model analyzing real-time deed recordings, tax assessment data, and market comparables.',
+  onOpenValuation,
 }: AIPropertyValuationCardProps) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleValuationClick = () => {
+    if (onOpenValuation) {
+      setIsLoading(true);
+      setToastMessage('Opening AI Property Valuation Engine...');
+      setTimeout(() => {
+        setIsLoading(false);
+        setToastMessage(null);
+        onOpenValuation();
+      }, 400);
+      return;
+    }
+
     setIsLoading(true);
     setToastMessage('Running AI Property Valuation analysis...');
     setTimeout(() => {
@@ -63,7 +76,7 @@ export function AIPropertyValuationCard({
             className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-xs sm:text-sm font-medium bg-[#550000] text-white hover:bg-[#400000] transition-all duration-200 shadow-xs shadow-[#550000]/20 active:scale-[0.98] cursor-pointer disabled:opacity-70"
           >
             <Sparkles className={`w-4 h-4 text-amber-300 ${isLoading ? 'animate-spin' : ''}`} />
-            <span>{isLoading ? 'Analyzing Valuation...' : 'AI Property Valuation'}</span>
+            <span>{isLoading ? 'Loading Engine...' : 'AI Property Valuation'}</span>
           </button>
         </div>
       </div>

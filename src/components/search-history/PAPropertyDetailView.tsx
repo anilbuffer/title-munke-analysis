@@ -15,6 +15,7 @@ import {
   PADocumentItem,
 } from '@/data/mock-pa-property-details';
 import { AIPropertyValuationCard } from './AIPropertyValuationCard';
+import { AIPropertyValuationView } from '@/components/valuation/AIPropertyValuationView';
 
 interface PAPropertyDetailViewProps {
   onBack: () => void;
@@ -25,6 +26,7 @@ export function PAPropertyDetailView({ onBack }: PAPropertyDetailViewProps) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [mapType, setMapType] = useState<'Map' | 'Satellite'>('Map');
+  const [isViewingValuation, setIsViewingValuation] = useState(false);
 
   const property = MOCK_PA_PROPERTY_EXACT;
   const docs = [...MOCK_PA_DOCUMENTS_EXACT].sort((a, b) => {
@@ -41,6 +43,15 @@ export function PAPropertyDetailView({ onBack }: PAPropertyDetailViewProps) {
     setToastMessage(`Viewing ${doc.documentType} recorded on ${doc.dateRecorded}...`);
     setTimeout(() => setToastMessage(null), 3000);
   };
+
+  if (isViewingValuation) {
+    return (
+      <AIPropertyValuationView
+        onBack={() => setIsViewingValuation(false)}
+        initialPropertyAddress="3010 BRIGGS AVENUE, BX, New York City"
+      />
+    );
+  }
 
   return (
     <div className="w-full space-y-4 animate-in fade-in duration-300">
@@ -342,7 +353,10 @@ export function PAPropertyDetailView({ onBack }: PAPropertyDetailViewProps) {
         </div>
 
         {/* Section: AI Property Valuation Engine */}
-        <AIPropertyValuationCard data={MOCK_PA_VALUATION_DATA} />
+        <AIPropertyValuationCard
+          data={MOCK_PA_VALUATION_DATA}
+          onOpenValuation={() => setIsViewingValuation(true)}
+        />
 
         {/* Section: Document Processing Status */}
         <div className="mt-8 pt-6 border-t border-[#f0e8e0]">

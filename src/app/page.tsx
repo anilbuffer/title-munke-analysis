@@ -16,6 +16,7 @@ import { TestConnectionModal } from '@/components/ai-settings/TestConnectionModa
 import { AddTokensModal } from '@/components/ai-settings/AddTokensModal';
 import { ToastContainer } from '@/components/ai-settings/Toast';
 import { SearchHistoryView } from '@/components/search-history/SearchHistoryView';
+import { AIPropertyValuationView } from '@/components/valuation/AIPropertyValuationView';
 import {
   User,
   CreditCard,
@@ -96,6 +97,11 @@ export default function AISettingsPage() {
           {/* 1. SEARCH HISTORY VIEW (Matches User Attached Screenshots) */}
           {activeNav === 'Search History' && (
             <SearchHistoryView onBack={() => setActiveNav('Dashboard')} />
+          )}
+
+          {/* AI PROPERTY VALUATION ENGINE (FULL PAGE) */}
+          {activeNav === 'AI Valuation' && (
+            <AIPropertyValuationView onBack={() => setActiveNav('Search History')} />
           )}
 
           {/* 2. SETTINGS VIEW */}

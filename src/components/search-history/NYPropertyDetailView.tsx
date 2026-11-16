@@ -15,6 +15,7 @@ import {
   NYDocumentItemExact,
 } from '@/data/mock-ny-property-details';
 import { AIPropertyValuationCard } from './AIPropertyValuationCard';
+import { AIPropertyValuationView } from '@/components/valuation/AIPropertyValuationView';
 
 interface NYPropertyDetailViewProps {
   onBack: () => void;
@@ -24,6 +25,7 @@ interface NYPropertyDetailViewProps {
 export function NYPropertyDetailView({ onBack }: NYPropertyDetailViewProps) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [isViewingValuation, setIsViewingValuation] = useState(false);
 
   const property = MOCK_NY_PROPERTY_3010_BRIGGS;
   const docs = [...MOCK_NY_DOCUMENTS_3010_BRIGGS].sort((a, b) => {
@@ -40,6 +42,15 @@ export function NYPropertyDetailView({ onBack }: NYPropertyDetailViewProps) {
     setToastMessage(`Viewing ${doc.documentType} recorded on ${doc.dateRecorded}...`);
     setTimeout(() => setToastMessage(null), 3000);
   };
+
+  if (isViewingValuation) {
+    return (
+      <AIPropertyValuationView
+        onBack={() => setIsViewingValuation(false)}
+        initialPropertyAddress={property.title || '3010 BRIGGS AVENUE, BX, New York City'}
+      />
+    );
+  }
 
   return (
     <div className="w-full space-y-4 animate-in fade-in duration-300">
@@ -274,7 +285,10 @@ export function NYPropertyDetailView({ onBack }: NYPropertyDetailViewProps) {
         </div>
 
         {/* Section: AI Property Valuation Engine */}
-        <AIPropertyValuationCard data={MOCK_NY_VALUATION_DATA} />
+        <AIPropertyValuationCard
+          data={MOCK_NY_VALUATION_DATA}
+          onOpenValuation={() => setIsViewingValuation(true)}
+        />
 
         {/* Section: Document Processing Status */}
         <div className="mt-8 pt-6 border-t border-[#f0e8e0]">

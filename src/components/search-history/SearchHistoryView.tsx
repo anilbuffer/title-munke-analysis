@@ -13,6 +13,7 @@ import {
   X,
   CheckCircle2,
   Bot,
+  Sparkles,
 } from 'lucide-react';
 import {
   PENNSYLVANIA_SEARCH_HISTORY,
@@ -21,6 +22,7 @@ import {
 } from '@/data/mock-search-history';
 import { NYPropertyDetailView } from './NYPropertyDetailView';
 import { PAPropertyDetailView } from './PAPropertyDetailView';
+import { AIPropertyValuationView } from '@/components/valuation/AIPropertyValuationView';
 
 interface SearchHistoryViewProps {
   onBack?: () => void;
@@ -32,6 +34,7 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
   const [searchQuery, setSearchQuery] = useState('');
   const [viewingPAProperty, setViewingPAProperty] = useState<string | null>(null);
   const [viewingNYProperty, setViewingNYProperty] = useState<string | null>(null);
+  const [viewingValuationProperty, setViewingValuationProperty] = useState<string | null>(null);
   const [sortField, setSortField] = useState<'srNo' | 'address' | 'dateTime' | 'status'>('srNo');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -39,7 +42,7 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
   const rawData = activeTab === 'Pennsylvania' ? PENNSYLVANIA_SEARCH_HISTORY : NEW_YORK_SEARCH_HISTORY;
 
   const filteredData = useMemo(() => {
-    let result = rawData.filter((item) => {
+    const result = rawData.filter((item) => {
       const q = searchQuery.toLowerCase();
       return (
         item.address.toLowerCase().includes(q) ||
@@ -115,6 +118,17 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
       <NYPropertyDetailView
         onBack={() => setViewingNYProperty(null)}
         propertyAddress={viewingNYProperty}
+      />
+    );
+  }
+
+  // If viewing AI Property Valuation Engine (FULL PAGE, NOT A MODAL)
+  // Placed AFTER all hooks to adhere to React Rules of Hooks
+  if (viewingValuationProperty) {
+    return (
+      <AIPropertyValuationView
+        onBack={() => setViewingValuationProperty(null)}
+        initialPropertyAddress={viewingValuationProperty}
       />
     );
   }
@@ -344,15 +358,25 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
                       )}
                     </td>
 
-                    {/* Action - Eye icon opens Full Page Detail View (NOT A MODAL) */}
+                    {/* Actions: View Details & AI Property Valuation */}
                     <td className="py-4 px-4 sm:px-6 whitespace-nowrap text-center">
-                      <button
-                        onClick={() => handleViewRecord(row)}
-                        className="p-1 rounded-md text-[#3d2014] hover:text-[#550000] hover:bg-stone-100 transition-colors cursor-pointer inline-flex items-center justify-center"
-                        title={activeTab === 'New York' ? 'View ACRIS Records & Property Specs' : 'View Pennsylvania Property & Recorded Deeds'}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center justify-center gap-1.5">
+                        <button
+                          onClick={() => handleViewRecord(row)}
+                          className="p-1 rounded-md text-[#3d2014] hover:text-[#550000] hover:bg-stone-100 transition-colors cursor-pointer inline-flex items-center justify-center"
+                          title={activeTab === 'New York' ? 'View ACRIS Records & Property Specs' : 'View Pennsylvania Property & Recorded Deeds'}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          onClick={() => setViewingValuationProperty(row.address)}
+                          className="p-1 rounded-md text-[#550000] hover:bg-[#f8e8e8] transition-colors cursor-pointer inline-flex items-center justify-center"
+                          title="Run AI Property Valuation Engine"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
