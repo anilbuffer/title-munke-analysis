@@ -136,7 +136,7 @@ export function ValuationHeader({
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#550000] text-white hover:bg-[#400000] transition-colors cursor-pointer shadow-2xs"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Export CMA Report</span>
+            <span>Export Report</span>
           </button>
         </div>
       </div>

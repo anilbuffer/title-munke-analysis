@@ -99,7 +99,13 @@ export default function AISettingsPage() {
         <main className="flex-1 pb-8">
           {/* Active Flow: Search History */}
           {activeNav === 'Search History' && (
-            <SearchHistoryView />
+            <SearchHistoryView
+              onBack={() => {
+                if (typeof window !== 'undefined' && window.history.length > 1) {
+                  window.history.back();
+                }
+              }}
+            />
           )}
 
           {/* Other pages are disabled and inaccessible */}

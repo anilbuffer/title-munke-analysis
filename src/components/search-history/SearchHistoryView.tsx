@@ -14,7 +14,6 @@ import {
   CheckCircle2,
   Bot,
   Sparkles,
-  Briefcase,
 } from 'lucide-react';
 import {
   PENNSYLVANIA_SEARCH_HISTORY,
@@ -24,6 +23,7 @@ import {
 import { NYPropertyDetailView } from './NYPropertyDetailView';
 import { PAPropertyDetailView } from './PAPropertyDetailView';
 import { AIPropertyValuationView } from '@/components/valuation/AIPropertyValuationView';
+import { SearchResultsMapModal } from './SearchResultsMapModal';
 
 interface SearchHistoryViewProps {
   onBack?: () => void;
@@ -36,6 +36,7 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
   const [viewingPAProperty, setViewingPAProperty] = useState<string | null>(null);
   const [viewingNYProperty, setViewingNYProperty] = useState<string | null>(null);
   const [viewingValuationProperty, setViewingValuationProperty] = useState<string | null>(null);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [sortField, setSortField] = useState<'srNo' | 'address' | 'dateTime' | 'status'>('srNo');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -87,10 +88,18 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
   };
 
   const handleDownload = (record: SearchHistoryItem) => {
-    setToastMessage(`Generating Broker Title Closing Package for ${record.address}...`);
+    setToastMessage(`Downloading Title Abstract for ${record.address}...`);
     setTimeout(() => {
       setToastMessage(null);
     }, 3500);
+  };
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else if (typeof window !== 'undefined' && window.history.length > 1) {
+      window.history.back();
+    }
   };
 
   const handleViewRecord = (record: SearchHistoryItem) => {
@@ -144,54 +153,15 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
         </div>
       )}
 
-      {/* Top: Back Navigation Banner (Only rendered when onBack is explicitly passed) */}
-      {onBack && (
-        <div className="bg-[#ede4db] rounded-2xl px-5 py-3 mb-5 flex items-center border border-[#e2d7cc] shadow-2xs">
-          <button
-            onClick={onBack}
-            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors cursor-pointer group"
-          >
-            <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-            <span>Back</span>
-          </button>
-        </div>
-      )}
-
-      {/* Broker Portal Header Bar */}
-      <div className="bg-[#ede4db] rounded-2xl p-4 sm:p-5 mb-5 border border-[#e2d7cc] shadow-2xs">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-[#550000] text-white flex items-center justify-center shrink-0 shadow-xs">
-              <Briefcase className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-sm sm:text-base font-bold text-[#3d2014]">
-                  Broker Search History & Closing Pipeline
-                </h1>
-                <span className="text-[10px] font-semibold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">
-                  Verified
-                </span>
-              </div>
-              <p className="text-xs text-stone-600 mt-0.5">
-                Brokerage title abstract records, deed chains, lien verification & AI property valuation models.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 self-start md:self-auto">
-            <button
-              onClick={() => {
-                setToastMessage(`Exporting ${activeTab} Broker Portfolio Package (CSV)...`);
-                setTimeout(() => setToastMessage(null), 3000);
-              }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#eadfd4] bg-white text-stone-800 hover:bg-stone-50 text-xs font-medium shadow-2xs cursor-pointer transition-colors"
-            >
-              <Download className="w-3.5 h-3.5 text-stone-600" />
-              <span>Export Portfolio</span>
-            </button>
-          </div>
-        </div>
+      {/* Top: Back Navigation Banner (Earliest Layout) */}
+      <div className="bg-[#ede4db] rounded-2xl px-5 py-3 mb-5 flex items-center border border-[#e2d7cc] shadow-2xs">
+        <button
+          onClick={handleBack}
+          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors cursor-pointer group"
+        >
+          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+          <span>Back</span>
+        </button>
       </div>
 
       {/* Tabs Header Bar */}
@@ -242,11 +212,11 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
             )}
           </div>
 
-          {/* Map View Indicator Icon (matching New York screenshot right button) */}
+          {/* Map View Indicator Icon (Opens Search Results Map Modal) */}
           <button
-            onClick={() => alert(`Showing map distribution for ${activeTab} deeds...`)}
+            onClick={() => setIsMapModalOpen(true)}
             className="w-8 h-8 rounded-lg bg-[#550000] text-white flex items-center justify-center hover:bg-[#680000] shadow-2xs transition-colors cursor-pointer"
-            title="Map view"
+            title={`View ${activeTab} Search Results Map`}
           >
             <MapPin className="w-4 h-4" />
           </button>
@@ -444,6 +414,22 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
           <Bot className="w-6 h-6" />
         </button>
       </div>
+
+      {/* Search Results Map Modal matching user screenshot */}
+      <SearchResultsMapModal
+        isOpen={isMapModalOpen}
+        onClose={() => setIsMapModalOpen(false)}
+        activeTab={activeTab}
+        records={filteredData}
+        onSelectProperty={(address) => {
+          if (activeTab === 'Pennsylvania') {
+            setViewingPAProperty(address);
+          } else {
+            setViewingNYProperty(address);
+          }
+        }}
+        onOpenValuation={(address) => setViewingValuationProperty(address)}
+      />
     </div>
   );
 }
