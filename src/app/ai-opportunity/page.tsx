@@ -13,12 +13,6 @@ export default function AIOpportunityPage() {
   const handleNavSelect = (item: string) => {
     if (item === 'Search History') {
       router.push('/search-history');
-    } else if (item === 'Settings') {
-      router.push('/');
-    } else if (item === 'AI Opportunity') {
-      // already on AI Opportunity
-    } else {
-      router.push(`/?tab=${encodeURIComponent(item)}`);
     }
   };
 

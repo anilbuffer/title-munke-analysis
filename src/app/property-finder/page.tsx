@@ -13,13 +13,6 @@ export default function PropertyFinderPage() {
   const handleNavSelect = (item: string) => {
     if (item === 'Search History') {
       router.push('/search-history');
-    } else if (item === 'Settings') {
-      router.push('/');
-    } else if (item === 'AI Opportunity' || item === 'Property Finder') {
-      // Stay on current page or route
-      router.push('/property-finder');
-    } else {
-      router.push(`/?tab=${encodeURIComponent(item)}`);
     }
   };
 

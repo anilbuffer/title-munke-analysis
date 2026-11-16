@@ -11,12 +11,8 @@ export default function SearchHistoryPage() {
   const router = useRouter();
 
   const handleNavSelect = (item: string) => {
-    if (item === 'AI Opportunity') {
+    if (item === 'AI Opportunity' || item === 'Property Finder') {
       router.push('/ai-opportunity');
-    } else if (item === 'Settings') {
-      router.push('/');
-    } else if (item !== 'Search History') {
-      router.push(`/?tab=${encodeURIComponent(item)}`);
     }
   };
 
