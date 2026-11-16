@@ -3,8 +3,6 @@
 import React from 'react';
 import {
   ChevronLeft,
-  ShieldCheck,
-  AlertTriangle,
   Download,
   RotateCw,
   Search,
@@ -74,48 +72,14 @@ export function ValuationHeader({
       {/* Bottom Row: Address, BBL & Quick Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-base sm:text-lg font-bold text-[#3d2014] tracking-tight">
-              {currentRecord.propertyAddress}
-            </h1>
-
-            {/* Concise Status Pills */}
-            {currentRecord.eligibility === 'ELIGIBLE' && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#eaf4ec] text-[#2d7a3e] border border-[#d3ebd7]">
-                <ShieldCheck className="w-3 h-3" />
-                PLUTO Verified
-              </span>
-            )}
-            {currentRecord.eligibility === 'EXCLUDED_CONDO' && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200">
-                <AlertTriangle className="w-3 h-3" />
-                Condo Excluded
-              </span>
-            )}
-            {currentRecord.eligibility === 'EXCLUDED_COOP' && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200">
-                <AlertTriangle className="w-3 h-3" />
-                Co-op Excluded
-              </span>
-            )}
-            {currentRecord.eligibility === 'INSUFFICIENT_DATA' && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-300">
-                <AlertTriangle className="w-3 h-3" />
-                Internet Fallback
-              </span>
-            )}
-
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-stone-100 text-stone-600 border border-stone-200">
-              {currentRecord.confidenceLevel === 'HIGH_CONFIDENCE' ? 'High Confidence' : 'Lower Confidence'}
-            </span>
-          </div>
+          <h1 className="text-base sm:text-lg font-bold text-[#3d2014] tracking-tight">
+            {currentRecord.propertyAddress}
+          </h1>
 
           <div className="text-[11px] text-stone-500 flex items-center gap-2 flex-wrap">
             <span>BBL: <strong className="text-stone-700">{currentRecord.bbl}</strong></span>
             <span>•</span>
             <span>{currentRecord.plutoData.borough}</span>
-            <span>•</span>
-            <span>Class {currentRecord.plutoData.buildingClass} ({currentRecord.plutoData.buildingClassDescription})</span>
           </div>
         </div>
 

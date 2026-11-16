@@ -8,18 +8,17 @@ import { ValuationHeader } from './ValuationHeader';
 import { ValuationHeroCard } from './ValuationHeroCard';
 import { PriceOutlookChart } from './PriceOutlookChart';
 import { ComparableSalesTable } from './ComparableSalesTable';
-import { NeighborhoodComparisonCard } from './NeighborhoodComparisonCard';
 import { HistoricalValueChart } from './HistoricalValueChart';
 import { InternetFallbackCard } from './InternetFallbackCard';
 import { IneligiblePropertyCard } from './IneligiblePropertyCard';
-import { CheckCircle2, LayoutGrid, TrendingUp, FileSpreadsheet, Compass, History } from 'lucide-react';
+import { CheckCircle2, LayoutGrid, TrendingUp, FileSpreadsheet, History } from 'lucide-react';
 
 interface AIPropertyValuationViewProps {
   onBack: () => void;
   initialPropertyAddress?: string;
 }
 
-type ValuationSectionTab = 'all' | 'outlook' | 'comps' | 'neighborhood' | 'history';
+type ValuationSectionTab = 'all' | 'outlook' | 'comps' | 'history';
 
 export function AIPropertyValuationView({
   onBack,
@@ -62,7 +61,6 @@ export function AIPropertyValuationView({
     { id: 'all', label: 'All Insights', icon: LayoutGrid },
     { id: 'outlook', label: 'Price Outlook (1-5Y)', icon: TrendingUp },
     { id: 'comps', label: `Comps (${currentRecord.comparables.length})`, icon: FileSpreadsheet },
-    { id: 'neighborhood', label: 'Neighborhood & AI', icon: Compass },
     { id: 'history', label: 'Value History', icon: History },
   ];
 
@@ -84,7 +82,7 @@ export function AIPropertyValuationView({
         onRefresh={handleRefresh}
       />
 
-      {/* Hero Card: Market Value, Range, Price/Sq Ft & Specs */}
+      {/* Hero Card: Market Value, Price/Sq Ft & Specs */}
       <ValuationHeroCard record={currentRecord} />
 
       {/* Exclusion Card (if Condominium / Cooperative) */}
@@ -135,12 +133,7 @@ export function AIPropertyValuationView({
             <ComparableSalesTable record={currentRecord} />
           )}
 
-          {/* 3. Neighborhood Comparison & AI Take */}
-          {(activeTab === 'all' || activeTab === 'neighborhood') && (
-            <NeighborhoodComparisonCard record={currentRecord} />
-          )}
-
-          {/* 4. Value History */}
+          {/* 3. Value History */}
           {(activeTab === 'all' || activeTab === 'history') && (
             <HistoricalValueChart record={currentRecord} />
           )}

@@ -187,47 +187,6 @@ export function HistoricalValueChart({ record }: HistoricalValueChartProps) {
           </div>
         </div>
       )}
-
-      {/* Historical Milestones List: Compact & Clean */}
-      <div className="space-y-1.5 pt-1">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block px-1">
-          Historical Deed Filings & Assessments
-        </span>
-
-        <div className="divide-y divide-[#f5ede5] border border-[#f0e8e0] rounded-xl overflow-hidden bg-white">
-          {historicalPrices.map((item, idx) => (
-            <div
-              key={idx}
-              className="py-2 px-3 sm:px-3.5 flex items-center justify-between gap-2 hover:bg-[#fbf7f4] transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded bg-[#f8e8e8] text-[#550000] flex items-center justify-center font-bold text-[9px] shrink-0">
-                  {item.year.toString().slice(-2)}
-                </span>
-                <div>
-                  <div className="text-xs font-semibold text-[#3d2014] leading-tight">
-                    {item.eventDescription}
-                  </div>
-                  <div className="text-[10px] text-stone-400 flex items-center gap-1.5 mt-0.5">
-                    <span>{item.date}</span>
-                    <span>•</span>
-                    <span>{item.source}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-right shrink-0">
-                <div className="text-xs font-bold text-[#3d2014]">
-                  {formatCurrency(item.estimatedValue)}
-                </div>
-                <div className="text-[9px] text-stone-400">
-                  Year {item.year}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
