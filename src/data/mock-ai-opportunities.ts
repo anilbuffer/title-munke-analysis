@@ -37,6 +37,8 @@ export const MOCK_AI_OPPORTUNITIES: AIOpportunityProperty[] = [
       'Clean 40-year deed chain with zero recorded mechanics liens',
     ],
     schematicPoint: { x: 215, y: 165, islandIndex: 0 },
+    lat: 40.8718,
+    lng: -73.8862,
   },
   {
     id: 'BRONX-02',
@@ -73,6 +75,8 @@ export const MOCK_AI_OPPORTUNITIES: AIOpportunityProperty[] = [
       'Zero municipal encumbrances or open ECB violations',
     ],
     schematicPoint: { x: 265, y: 245, islandIndex: 0 },
+    lat: 40.8692,
+    lng: -73.8885,
   },
   {
     id: 'BRONX-03',
@@ -109,6 +113,8 @@ export const MOCK_AI_OPPORTUNITIES: AIOpportunityProperty[] = [
       'Title abstract clear with recent survey monumentation',
     ],
     schematicPoint: { x: 315, y: 295, islandIndex: 0 },
+    lat: 40.8735,
+    lng: -73.8812,
   },
   {
     id: 'BRONX-04',
@@ -144,6 +150,8 @@ export const MOCK_AI_OPPORTUNITIES: AIOpportunityProperty[] = [
       'Institutional use grandfathered under NYC Department of Buildings',
     ],
     schematicPoint: { x: 550, y: 160, islandIndex: 1 },
+    lat: 40.8705,
+    lng: -73.8895,
   },
   {
     id: 'BRONX-05',
@@ -179,6 +187,8 @@ export const MOCK_AI_OPPORTUNITIES: AIOpportunityProperty[] = [
       'Close proximity to Bronx River Parkway & I-87',
     ],
     schematicPoint: { x: 600, y: 195, islandIndex: 1 },
+    lat: 40.865,
+    lng: -73.887,
   },
 
   // --- BROOKLYN ---
@@ -216,6 +226,8 @@ export const MOCK_AI_OPPORTUNITIES: AIOpportunityProperty[] = [
       'Recent roof and boiler upgrades completed in 2024',
     ],
     schematicPoint: { x: 490, y: 275, islandIndex: 2 },
+    lat: 40.6315,
+    lng: -73.9425,
   },
   {
     id: 'BK-02',
@@ -251,6 +263,8 @@ export const MOCK_AI_OPPORTUNITIES: AIOpportunityProperty[] = [
       'Delivered with one unit vacant for immediate rental repricing',
     ],
     schematicPoint: { x: 535, y: 285, islandIndex: 2 },
+    lat: 40.6328,
+    lng: -73.9405,
   },
   {
     id: 'BK-03',
@@ -286,6 +300,8 @@ export const MOCK_AI_OPPORTUNITIES: AIOpportunityProperty[] = [
       'Tax class 2B limitation providing predictability on property taxes',
     ],
     schematicPoint: { x: 580, y: 265, islandIndex: 2 },
+    lat: 40.6285,
+    lng: -73.945,
   },
   {
     id: 'BK-04',
@@ -321,6 +337,8 @@ export const MOCK_AI_OPPORTUNITIES: AIOpportunityProperty[] = [
       'Strong condo-conversion or co-op repositioning potential',
     ],
     schematicPoint: { x: 450, y: 260, islandIndex: 2 },
+    lat: 40.7065,
+    lng: -73.9575,
   },
 
   // --- QUEENS ---
@@ -358,6 +376,8 @@ export const MOCK_AI_OPPORTUNITIES: AIOpportunityProperty[] = [
       'Low real estate tax assessment due to grandfathered Class 1 status',
     ],
     schematicPoint: { x: 740, y: 235, islandIndex: 3 },
+    lat: 40.7445,
+    lng: -73.9215,
   },
   {
     id: 'QN-02',
@@ -393,6 +413,8 @@ export const MOCK_AI_OPPORTUNITIES: AIOpportunityProperty[] = [
       'Quiet tree-lined residential enclave near St. John’s University',
     ],
     schematicPoint: { x: 790, y: 250, islandIndex: 3 },
+    lat: 40.735,
+    lng: -73.7995,
   },
   {
     id: 'QN-03',
@@ -428,6 +450,8 @@ export const MOCK_AI_OPPORTUNITIES: AIOpportunityProperty[] = [
       'Zero open building code violations on ACRIS or DOB registry',
     ],
     schematicPoint: { x: 840, y: 270, islandIndex: 3 },
+    lat: 40.7335,
+    lng: -73.801,
   },
   {
     id: 'QN-04',
@@ -463,5 +487,7 @@ export const MOCK_AI_OPPORTUNITIES: AIOpportunityProperty[] = [
       'Long-term triple net lease structure in place',
     ],
     schematicPoint: { x: 810, y: 220, islandIndex: 3 },
+    lat: 40.766,
+    lng: -73.892,
   },
 ];

@@ -35,4 +35,6 @@ export interface AIOpportunityProperty {
   rationale: string;
   keyHighlights: string[];
   schematicPoint: SchematicPoint;
+  lat: number;
+  lng: number;
 }
