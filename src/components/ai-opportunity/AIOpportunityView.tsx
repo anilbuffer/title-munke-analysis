@@ -21,8 +21,8 @@ export function AIOpportunityView({
 }: AIOpportunityViewProps) {
   // Filter States matching Image 1
   const [selectedBorough, setSelectedBorough] = useState<Borough>('Bronx');
-  const [minPrice, setMinPrice] = useState<number>(500000);
-  const [maxPrice, setMaxPrice] = useState<number>(2000000);
+  const [minPrice, setMinPrice] = useState<string | number>(500000);
+  const [maxPrice, setMaxPrice] = useState<string | number>(2000000);
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(
     initialPropertyId
   );
@@ -67,15 +67,30 @@ export function AIOpportunityView({
     return () => window.removeEventListener('popstate', checkUrl);
   }, []);
 
-  // Filter properties by Borough and Price range
+  // Filter properties by Borough and Price range dynamically
   const filteredProperties = useMemo(() => {
+    const numericMin = minPrice === '' ? 0 : Number(minPrice) || 0;
+    const numericMax = maxPrice === '' ? Infinity : Number(maxPrice) || Infinity;
+
     return MOCK_AI_OPPORTUNITIES.filter((prop) => {
       const matchesBorough = prop.borough === selectedBorough;
-      const matchesMin = minPrice ? prop.lastRecordedSalePrice >= minPrice : true;
-      const matchesMax = maxPrice ? prop.lastRecordedSalePrice <= maxPrice : true;
+      const matchesMin = numericMin > 0 ? prop.lastRecordedSalePrice >= numericMin : true;
+      const matchesMax = numericMax < Infinity ? prop.lastRecordedSalePrice <= numericMax : true;
       return matchesBorough && matchesMin && matchesMax;
     });
   }, [selectedBorough, minPrice, maxPrice]);
+
+  // Keep selected property in sync with filtered list
+  useEffect(() => {
+    if (filteredProperties.length > 0) {
+      const isCurrentInList = filteredProperties.some((p) => p.id === selectedPropertyId);
+      if (!isCurrentInList) {
+        setSelectedPropertyId(filteredProperties[0].id);
+      }
+    } else {
+      setSelectedPropertyId(null);
+    }
+  }, [filteredProperties, selectedPropertyId]);
 
   // The currently selected property object
   const selectedProperty = useMemo(() => {
@@ -250,13 +265,22 @@ export function AIOpportunityView({
               <label className="block text-[11px] font-bold text-stone-600 uppercase tracking-wider mb-1.5">
                 MIN HISTORICAL SALE PRICE ($)
               </label>
-              <input
-                type="number"
-                value={minPrice}
-                onChange={(e) => setMinPrice(Number(e.target.value) || 0)}
-                placeholder="500000"
-                className="w-full bg-white border border-[#eadfd4] rounded-full px-4 py-2 text-sm text-[#291e1a] font-medium placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-[#550000] focus:border-[#550000] transition-colors"
-              />
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 font-semibold text-sm">
+                  $
+                </span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={minPrice}
+                  onChange={(e) => {
+                    const clean = e.target.value.replace(/[^0-9]/g, '');
+                    setMinPrice(clean === '' ? '' : Number(clean));
+                  }}
+                  placeholder="500000"
+                  className="w-full bg-white border border-[#eadfd4] rounded-full pl-8 pr-4 py-2 text-sm text-[#291e1a] font-medium placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-[#550000] focus:border-[#550000] transition-colors"
+                />
+              </div>
             </div>
 
             {/* MAX HISTORICAL SALE PRICE ($) */}
@@ -264,13 +288,22 @@ export function AIOpportunityView({
               <label className="block text-[11px] font-bold text-stone-600 uppercase tracking-wider mb-1.5">
                 MAX HISTORICAL SALE PRICE ($)
               </label>
-              <input
-                type="number"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(Number(e.target.value) || 0)}
-                placeholder="2000000"
-                className="w-full bg-white border border-[#eadfd4] rounded-full px-4 py-2 text-sm text-[#291e1a] font-medium placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-[#550000] focus:border-[#550000] transition-colors"
-              />
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 font-semibold text-sm">
+                  $
+                </span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={maxPrice}
+                  onChange={(e) => {
+                    const clean = e.target.value.replace(/[^0-9]/g, '');
+                    setMaxPrice(clean === '' ? '' : Number(clean));
+                  }}
+                  placeholder="2000000"
+                  className="w-full bg-white border border-[#eadfd4] rounded-full pl-8 pr-4 py-2 text-sm text-[#291e1a] font-medium placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-[#550000] focus:border-[#550000] transition-colors"
+                />
+              </div>
             </div>
           </div>
 
@@ -296,6 +329,8 @@ export function AIOpportunityView({
             selectedPropertyId={selectedPropertyId}
             onSelectProperty={handleSelectPropertyFromMap}
             hoveredPropertyId={hoveredPropertyId}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
           />
         </div>
 

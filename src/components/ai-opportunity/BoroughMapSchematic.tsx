@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Plus, Minus, Navigation } from 'lucide-react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { Plus, Minus, Navigation, DollarSign } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import { AIOpportunityProperty, Borough } from '@/types/ai-opportunity';
 
@@ -11,6 +11,8 @@ interface BoroughMapSchematicProps {
   selectedPropertyId: string | null;
   onSelectProperty: (id: string) => void;
   hoveredPropertyId?: string | null;
+  minPrice?: string | number;
+  maxPrice?: string | number;
 }
 
 // Borough center coordinates & default zoom levels
@@ -22,20 +24,39 @@ const BOROUGH_CENTERS: Record<Borough, { center: [number, number]; zoom: number 
   'Staten Island': { center: [40.579, -74.15], zoom: 12 },
 };
 
-// 7 Authentic Schematic Dots matching Reference Image 1 exactly
-const SCHEMATIC_DOTS = [
-  // Island 1 (Left - Bronx / Manhattan)
-  { id: 'BRONX-01', x: 92, y: 75, address: '3025 Briggs Avenue', price: '$1,280,000', borough: 'Bronx' },
-  { id: 'BRONX-02', x: 116, y: 138, address: '280 E 198th Street', price: '$945,000', borough: 'Bronx' },
-  { id: 'BRONX-03', x: 138, y: 182, address: '3050 Bainbridge Avenue', price: '$1,820,000', borough: 'Bronx' },
-  // Island 2 (Top Right)
-  { id: 'DOT-4', x: 245, y: 72, address: '2980 Grand Concourse', price: '$2,150,000', borough: 'Bronx' },
-  { id: 'DOT-5', x: 268, y: 102, address: '2775 Webster Avenue', price: '$3,400,000', borough: 'Bronx' },
-  // Island 3 (Bottom Center - Brooklyn)
-  { id: 'BK-01', x: 226, y: 202, address: '3218 Avenue I', price: '$1,420,000', borough: 'Brooklyn' },
-  // Island 4 (Far Right - Queens)
-  { id: 'QN-02', x: 368, y: 168, address: '68-15 174th Street', price: '$1,150,000', borough: 'Queens' },
-];
+// Precise coordinates for all properties on the 4-island NYC Schematic Map (viewBox 0 0 440 285)
+const SCHEMATIC_COORDINATES: Record<string, { x: number; y: number }> = {
+  // Bronx properties (Island 1: West / Island 2: Upper East)
+  'BRONX-01': { x: 92, y: 75 },
+  'BRONX-02': { x: 116, y: 138 },
+  'BRONX-03': { x: 138, y: 182 },
+  'BRONX-04': { x: 245, y: 72 },
+  'BRONX-05': { x: 268, y: 102 },
+  // Brooklyn properties (Island 3: Bottom Center)
+  'BK-01': { x: 226, y: 202 },
+  'BK-02': { x: 252, y: 218 },
+  'BK-03': { x: 205, y: 188 },
+  'BK-04': { x: 265, y: 180 },
+  // Queens properties (Island 4: Far Right)
+  'QN-01': { x: 345, y: 155 },
+  'QN-02': { x: 368, y: 168 },
+  'QN-03': { x: 390, y: 195 },
+  'QN-04': { x: 382, y: 132 },
+};
+
+export function formatCompactPrice(price: number): string {
+  if (!price || isNaN(price)) return '$0';
+  if (price >= 1000000) {
+    const millions = price / 1000000;
+    return Number.isInteger(millions)
+      ? `$${millions}M`
+      : `$${millions.toFixed(2).replace(/\.?0+$/, '')}M`;
+  }
+  if (price >= 1000) {
+    return `$${Math.round(price / 1000)}k`;
+  }
+  return `$${price.toLocaleString()}`;
+}
 
 export function BoroughMapSchematic({
   borough,
@@ -43,6 +64,8 @@ export function BoroughMapSchematic({
   selectedPropertyId,
   onSelectProperty,
   hoveredPropertyId,
+  minPrice,
+  maxPrice,
 }: BoroughMapSchematicProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,7 +77,7 @@ export function BoroughMapSchematic({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const leafletRef = useRef<any>(null);
 
-  // Default to 'Roadmap' for real feel with pins, with instant toggle to Satellite or Schematic
+  // View switcher: Roadmap (default for real feel) | Satellite | Schematic
   const [viewMode, setViewMode] = useState<'Roadmap' | 'Satellite' | 'Schematic'>('Roadmap');
   const [schematicTooltip, setSchematicTooltip] = useState<{
     text: string;
@@ -63,7 +86,15 @@ export function BoroughMapSchematic({
     y: number;
   } | null>(null);
 
-  // Tile URL helper for Google Maps Roadmap & Satellite Hybrid
+  // Parse dynamic numeric prices for badges and display
+  const numericMin = typeof minPrice === 'number' ? minPrice : minPrice ? Number(minPrice) : 0;
+  const numericMax =
+    typeof maxPrice === 'number' ? maxPrice : maxPrice ? Number(maxPrice) : Infinity;
+
+  const formattedMinStr = numericMin > 0 ? formatCompactPrice(numericMin) : '$0';
+  const formattedMaxStr = numericMax < Infinity ? formatCompactPrice(numericMax) : 'No Max';
+
+  // Tile URL helper for Google Maps Roadmap & Satellite
   const getTileUrl = (mode: 'Roadmap' | 'Satellite') => {
     if (mode === 'Satellite') {
       return 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}';
@@ -85,10 +116,7 @@ export function BoroughMapSchematic({
       const isSelected = selectedPropertyId === prop.id;
       const isHovered = hoveredPropertyId === prop.id;
 
-      const formattedPrice =
-        prop.lastRecordedSalePrice >= 1000000
-          ? `$${(prop.lastRecordedSalePrice / 1000000).toFixed(2)}M`
-          : `$${(prop.lastRecordedSalePrice / 1000).toFixed(0)}k`;
+      const formattedPrice = formatCompactPrice(prop.lastRecordedSalePrice);
 
       const pinIcon = L.divIcon({
         className: 'title-munke-map-pin',
@@ -137,7 +165,6 @@ export function BoroughMapSchematic({
         zIndexOffset: isSelected ? 1000 : isHovered ? 500 : 100,
       });
 
-      // Hover tooltip with address and property type
       marker.bindTooltip(
         `<div style="font-weight: 600; color: #fff;">${prop.address}</div>
          <div style="font-size: 10px; color: #fca5a5;">${prop.propertyType} · $${prop.lastRecordedSalePrice.toLocaleString()}</div>`,
@@ -253,18 +280,39 @@ export function BoroughMapSchematic({
     mapInstanceRef.current.flyTo(config.center, config.zoom, { duration: 0.8 });
   };
 
+  // Properties mapped to Schematic points
+  const schematicPins = useMemo(() => {
+    return properties.map((p) => {
+      const coords = SCHEMATIC_COORDINATES[p.id] || { x: 120, y: 120 };
+      return {
+        ...p,
+        x: coords.x,
+        y: coords.y,
+        formattedPrice: formatCompactPrice(p.lastRecordedSalePrice),
+      };
+    });
+  }, [properties]);
+
   return (
     <div className="w-full">
       {/* Outer Card with warm Title Munke styling */}
       <div className="relative bg-[#fcfaf7] border border-[#eadfd4] rounded-2xl p-4 sm:p-5 shadow-2xs">
-        {/* Top Header Row: BOROUGH MAP · SCHEMATIC + View Switcher */}
+        {/* Top Header Row: BOROUGH MAP · SCHEMATIC + Dynamic Price Filter Badge + View Switcher */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
               BOROUGH MAP {viewMode === 'Schematic' ? '· SCHEMATIC' : ''}
             </span>
             <span className="text-xs font-semibold text-stone-700 bg-stone-200/80 px-2.5 py-0.5 rounded-md">
               {borough}
+            </span>
+
+            {/* Live Price Filter Badge on Map Header: Updates in real-time when inputs are edited */}
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-[#550000] bg-[#f8e8e8] border border-[#f3d1d1] px-2.5 py-0.5 rounded-md shadow-2xs">
+              <DollarSign className="w-3 h-3 text-[#550000]" />
+              <span>
+                {formattedMinStr} – {formattedMaxStr}
+              </span>
             </span>
           </div>
 
@@ -286,7 +334,7 @@ export function BoroughMapSchematic({
           </div>
         </div>
 
-        {/* 1. REAL INTERACTIVE LEAFLET MAP (Roadmap & Satellite with Live Pin Points) */}
+        {/* 1. REAL INTERACTIVE LEAFLET MAP (Roadmap & Satellite with Live Pin Points & Price Badges) */}
         {viewMode !== 'Schematic' && (
           <div className="relative w-full h-[320px] sm:h-[380px] rounded-xl overflow-hidden border border-[#eadfd4] shadow-inner bg-[#e5e3df]">
             <div ref={mapContainerRef} className="w-full h-full z-0" />
@@ -316,15 +364,29 @@ export function BoroughMapSchematic({
               </button>
             </div>
 
-            {/* Bottom Legend Badge */}
+            {/* If zero properties in current price range */}
+            {properties.length === 0 && (
+              <div className="absolute inset-0 z-10 bg-white/80 backdrop-blur-xs flex flex-col items-center justify-center p-6 text-center">
+                <p className="text-sm font-bold text-[#291e1a]">
+                  No properties found in {borough} matching this price range
+                </p>
+                <p className="text-xs text-stone-500 mt-1">
+                  Adjust MIN or MAX price fields to view recorded sales.
+                </p>
+              </div>
+            )}
+
+            {/* Bottom Legend Badge showing active count and live price range */}
             <div className="absolute bottom-3 left-3 z-10 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-stone-200/80 text-[11px] text-stone-700 font-medium shadow-2xs flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#550000]"></span>
-              <span>{properties.length} recorded sale properties in {borough}</span>
+              <span>
+                {properties.length} recorded sale properties in {borough} ({formattedMinStr} – {formattedMaxStr})
+              </span>
             </div>
           </div>
         )}
 
-        {/* 2. AUTHENTIC SCHEMATIC VECTOR MAP (Pixel-exact reference reconstruction) */}
+        {/* 2. AUTHENTIC SCHEMATIC VECTOR MAP (With Live Dynamic Price Tags) */}
         {viewMode === 'Schematic' && (
           <div className="relative w-full py-2 flex flex-col items-center justify-center">
             {/* Constrained container maintaining natural 440x285 proportions without pancake stretching */}
@@ -389,66 +451,89 @@ export function BoroughMapSchematic({
                   NYC · Illustrative map
                 </text>
 
-                {/* 7 Schematic Pin Points */}
-                {SCHEMATIC_DOTS.map((dot) => {
-                  const matchedProp = properties.find(
-                    (p) =>
-                      p.id === dot.id ||
-                      (borough === 'Brooklyn' && dot.id === 'BK-01' && p.borough === 'Brooklyn') ||
-                      (borough === 'Queens' && dot.id === 'QN-02' && p.borough === 'Queens')
-                  );
+                {/* If zero properties in current price range */}
+                {schematicPins.length === 0 && (
+                  <text
+                    x="220"
+                    y="140"
+                    textAnchor="middle"
+                    fill="#550000"
+                    fontSize="12"
+                    fontWeight="700"
+                    fontFamily="var(--font-poppins), sans-serif"
+                  >
+                    No properties in {borough} matching {formattedMinStr} – {formattedMaxStr}
+                  </text>
+                )}
 
-                  const isSelected = matchedProp
-                    ? selectedPropertyId === matchedProp.id
-                    : selectedPropertyId === dot.id;
-                  const isHovered = matchedProp ? hoveredPropertyId === matchedProp.id : false;
-
-                  const displayAddress = matchedProp ? matchedProp.address : dot.address;
-                  const displayPrice = matchedProp
-                    ? `$${matchedProp.lastRecordedSalePrice.toLocaleString()}`
-                    : dot.price;
+                {/* Live Dynamic Schematic Pins with Price Badges that update when price fields change */}
+                {schematicPins.map((prop) => {
+                  const isSelected = selectedPropertyId === prop.id;
+                  const isHovered = hoveredPropertyId === prop.id;
 
                   return (
                     <g
-                      key={dot.id}
-                      className="cursor-pointer"
-                      onClick={() => {
-                        if (matchedProp) {
-                          onSelectProperty(matchedProp.id);
-                        }
-                      }}
+                      key={prop.id}
+                      className="cursor-pointer group"
+                      onClick={() => onSelectProperty(prop.id)}
                       onMouseEnter={() =>
                         setSchematicTooltip({
-                          text: displayAddress,
-                          subtext: displayPrice,
-                          x: dot.x,
-                          y: dot.y,
+                          text: prop.address,
+                          subtext: `$${prop.lastRecordedSalePrice.toLocaleString()}`,
+                          x: prop.x,
+                          y: prop.y,
                         })
                       }
                       onMouseLeave={() => setSchematicTooltip(null)}
                     >
+                      {/* Live Price Badge Pill floating directly above the pin */}
+                      <g transform={`translate(${prop.x}, ${prop.y - 14})`}>
+                        <rect
+                          x="-23"
+                          y="-9"
+                          width="46"
+                          height="18"
+                          rx="9"
+                          fill={isSelected ? '#550000' : '#291e1a'}
+                          stroke="#ffffff"
+                          strokeWidth="1.5"
+                          filter="url(#islandShadow)"
+                        />
+                        <text
+                          x="0"
+                          y="3.5"
+                          textAnchor="middle"
+                          fill="#ffffff"
+                          fontSize="9.5"
+                          fontWeight="700"
+                          fontFamily="var(--font-poppins), sans-serif"
+                        >
+                          {prop.formattedPrice}
+                        </text>
+                      </g>
+
                       {/* Outer Selection Halo Ring matching Image 1 */}
                       {isSelected && (
                         <circle
-                          cx={dot.x}
-                          cy={dot.y}
+                          cx={prop.x}
+                          cy={prop.y}
                           r="11"
                           fill="none"
                           stroke="#550000"
-                          strokeWidth="1.5"
-                          opacity="0.4"
+                          strokeWidth="1.6"
+                          opacity="0.5"
                         />
                       )}
 
                       {/* Burgundy Pin Circle with White Ring */}
                       <circle
-                        cx={dot.x}
-                        cy={dot.y}
-                        r={isSelected ? 6.5 : isHovered ? 6 : 5.5}
-                        fill="#4a0e0e"
+                        cx={prop.x}
+                        cy={prop.y}
+                        r={isSelected ? 6.5 : isHovered ? 6 : 5}
+                        fill={isSelected ? '#550000' : '#4a0e0e'}
                         stroke="#ffffff"
                         strokeWidth="2.5"
-                        className="transition-transform duration-150 hover:scale-125"
+                        className="transition-transform duration-150 group-hover:scale-125"
                       />
                     </g>
                   );
@@ -458,7 +543,7 @@ export function BoroughMapSchematic({
                 {schematicTooltip && (
                   <g
                     transform={`translate(${Math.min(Math.max(schematicTooltip.x - 70, 10), 300)}, ${
-                      schematicTooltip.y > 80 ? schematicTooltip.y - 42 : schematicTooltip.y + 16
+                      schematicTooltip.y > 80 ? schematicTooltip.y - 44 : schematicTooltip.y + 16
                     })`}
                     pointerEvents="none"
                   >
@@ -499,11 +584,11 @@ export function BoroughMapSchematic({
           </div>
         )}
 
-        {/* Footnote below Map Card */}
+        {/* Footnote below Map Card showing active live price filter */}
         <div className="flex flex-wrap items-center justify-between text-xs text-stone-400 mt-2.5">
           <span>
             {viewMode === 'Schematic'
-              ? 'Map points are schematic, not geocoded property coordinates.'
+              ? `Map points are schematic, not geocoded. Filter: ${formattedMinStr} – ${formattedMaxStr}.`
               : `Interactive geocoded GIS map showing registered ACRIS deeds in ${borough}.`}
           </span>
           {viewMode !== 'Schematic' && (
