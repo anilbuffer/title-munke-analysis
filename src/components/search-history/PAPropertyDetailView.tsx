@@ -12,10 +12,10 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import {
-  MOCK_PA_PROPERTY_EXACT,
   MOCK_PA_DOCUMENTS_EXACT,
   MOCK_PA_VALUATION_DATA,
   PADocumentItem,
+  getPAPropertyDetails,
 } from '@/data/mock-pa-property-details';
 import { AIPropertyValuationCard } from './AIPropertyValuationCard';
 import { AIPropertyValuationView } from '@/components/valuation/AIPropertyValuationView';
@@ -34,11 +34,9 @@ export function PAPropertyDetailView({
   const [mapType, setMapType] = useState<'Map' | 'Satellite'>('Map');
   const [isViewingValuation, setIsViewingValuation] = useState(false);
 
-  const property = MOCK_PA_PROPERTY_EXACT;
+  const property = getPAPropertyDetails(propertyAddress);
   const displayAddress = propertyAddress || property.property || '6432 SCHOLLER RD, Lynn Township, PA';
-  const displayTitle = propertyAddress
-    ? `${propertyAddress}, Lehigh County, Pennsylvania`
-    : property.title;
+  const displayTitle = property.title || (propertyAddress ? `${propertyAddress}, Lehigh County, Pennsylvania` : '6432 SCHOLLER RD, Lynn Township, PA');
 
   const docs = [...MOCK_PA_DOCUMENTS_EXACT].sort((a, b) => {
     return sortOrder === 'asc'
@@ -273,7 +271,13 @@ export function PAPropertyDetailView({
 
                 {/* Bottom-Left: Property Photo badge */}
                 <div className="absolute bottom-2.5 left-2.5 z-10 px-2 py-0.5 bg-black/65 backdrop-blur-xs text-[10px] text-white/90 rounded tracking-tight">
-                  Property Preview • Rural Residential
+                  Property Preview •{' '}
+                  {displayAddress.toUpperCase().includes('CHEW') ||
+                  displayAddress.toUpperCase().includes('ALLENTOWN')
+                    ? 'Allentown Residential'
+                    : displayAddress.toUpperCase().includes('HILL')
+                    ? 'Suburban Residence'
+                    : 'Rural Residential'}
                 </div>
 
                 {/* Bottom-Right: Interactive Explore 360 Button */}

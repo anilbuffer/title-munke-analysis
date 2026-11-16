@@ -13,10 +13,10 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import {
-  MOCK_NY_PROPERTY_3010_BRIGGS,
   MOCK_NY_DOCUMENTS_3010_BRIGGS,
   MOCK_NY_VALUATION_DATA,
   NYDocumentItemExact,
+  getNYPropertyDetails,
 } from '@/data/mock-ny-property-details';
 import { AIPropertyValuationCard } from './AIPropertyValuationCard';
 import { AIPropertyValuationView } from '@/components/valuation/AIPropertyValuationView';
@@ -35,11 +35,9 @@ export function NYPropertyDetailView({
   const [isViewingValuation, setIsViewingValuation] = useState(false);
   const [mapType, setMapType] = useState<'Map' | 'Satellite'>('Map');
 
-  const property = MOCK_NY_PROPERTY_3010_BRIGGS;
+  const property = getNYPropertyDetails(propertyAddress);
   const displayAddress = propertyAddress || property.property || '3010 BRIGGS AVENUE, BX, New York City';
-  const displayTitle = propertyAddress
-    ? `${propertyAddress}, New York City`
-    : property.title;
+  const displayTitle = property.title || (propertyAddress ? `${propertyAddress}, New York City` : '3010 BRIGGS AVENUE, BX, New York City');
 
   const docs = [...MOCK_NY_DOCUMENTS_3010_BRIGGS].sort((a, b) => {
     return sortOrder === 'asc'

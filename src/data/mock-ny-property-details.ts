@@ -52,6 +52,123 @@ export const MOCK_NY_PROPERTY_3010_BRIGGS: NYPropertyDetailsExact = {
   satelliteMapUrl: '/ny-briggs-satellite-hd.jpg',
 };
 
+export function getNYPropertyDetails(address?: string): NYPropertyDetailsExact {
+  if (!address) return MOCK_NY_PROPERTY_3010_BRIGGS;
+
+  const addrUpper = address.toUpperCase();
+
+  if (
+    addrUpper.includes('WEST 2') ||
+    addrUpper.includes('WEST 2ND') ||
+    addrUpper.includes('2612') ||
+    addrUpper.includes('2611')
+  ) {
+    return {
+      title: '2612 WEST 2 STREET, Brooklyn, New York',
+      bbl: '3071850024',
+      status: 'SUCCESS',
+      property: '2612 WEST 2 STREET',
+      countyState: 'Kings (Brooklyn), NY',
+      municipality: 'New York City',
+      blockLot: 'Block 7185, Lot 24',
+      zipCode: '11223',
+      currentOwner: 'GRAVESEND RESIDENTIAL REALTY LLC',
+      dateOfSearch: '10/12/2026',
+      type: 'C1 - Multi-Family Walkup',
+      yearBuilt: '1962',
+      floors: '4',
+      units: '16',
+      lotArea: '14,200 sq ft',
+      bblNumber: '3071850024',
+      zoning: 'R6',
+      taxAssessment: '$2,460,000',
+      streetViewUrl: '/ny-2612-west2.jpg',
+      mapUrl: '/ny-briggs-map-hd.jpg',
+      satelliteMapUrl: '/ny-briggs-satellite-hd.jpg',
+    };
+  }
+
+  if (
+    addrUpper.includes('7 AVENUE') ||
+    addrUpper.includes('AMERICAS') ||
+    addrUpper.includes('BROADWAY') ||
+    addrUpper.includes('5 AVENUE') ||
+    addrUpper.includes('1 AVENUE') ||
+    addrUpper.includes('3 AVENUE') ||
+    addrUpper.includes('9 AVENUE') ||
+    addrUpper.includes('6TH') ||
+    addrUpper.includes('EAST 6')
+  ) {
+    return {
+      title: `${address}, New York`,
+      bbl: '1008010045',
+      status: 'SUCCESS',
+      property: address.split(',')[0],
+      countyState: 'New York (Manhattan), NY',
+      municipality: 'New York City',
+      blockLot: 'Block 801, Lot 45',
+      zipCode: '10001',
+      currentOwner: 'MIDTOWN MANHATTAN HOLDINGS LLC',
+      dateOfSearch: '11/16/2026',
+      type: 'O4 - Commercial Office',
+      yearBuilt: '1974',
+      floors: '28',
+      units: '82',
+      lotArea: '48,000 sq ft',
+      bblNumber: '1008010045',
+      zoning: 'C6-4',
+      taxAssessment: '$42,500,000',
+      streetViewUrl: '/ny-manhattan-commercial.jpg',
+      mapUrl: '/ny-briggs-map-hd.jpg',
+      satelliteMapUrl: '/ny-briggs-satellite-hd.jpg',
+    };
+  }
+
+  if (
+    addrUpper.includes('AVENUE I') ||
+    addrUpper.includes('174') ||
+    addrUpper.includes('BEDFORD') ||
+    addrUpper.includes('KINGS HIGHWAY') ||
+    addrUpper.includes('HUDSON')
+  ) {
+    return {
+      title: `${address}, New York`,
+      bbl: '3076120018',
+      status: 'SUCCESS',
+      property: address.split(',')[0],
+      countyState: address.includes('Queens')
+        ? 'Queens, NY'
+        : address.includes('Bronx')
+        ? 'Bronx, NY'
+        : 'Kings (Brooklyn), NY',
+      municipality: 'New York City',
+      blockLot: 'Block 7612, Lot 18',
+      zipCode: '11210',
+      currentOwner: 'NEW YORK METRO PROPERTIES TRUST',
+      dateOfSearch: '11/12/2026',
+      type: 'B2 - Two-Family Dwelling',
+      yearBuilt: '1954',
+      floors: '2',
+      units: '2',
+      lotArea: '3,800 sq ft',
+      bblNumber: '3076120018',
+      zoning: 'R4',
+      taxAssessment: '$1,180,000',
+      streetViewUrl: '/ny-brooklyn-residential.jpg',
+      mapUrl: '/ny-briggs-map-hd.jpg',
+      satelliteMapUrl: '/ny-briggs-satellite-hd.jpg',
+    };
+  }
+
+  // Default: 3010 Briggs
+  return {
+    ...MOCK_NY_PROPERTY_3010_BRIGGS,
+    title: address.includes('New York') ? address : `${address}, New York City`,
+    property: address.split(',')[0],
+    streetViewUrl: '/ny-briggs-streetview-hd.jpg',
+  };
+}
+
 export const MOCK_NY_DOCUMENTS_3010_BRIGGS: NYDocumentItemExact[] = [
   { srNo: 1, documentType: 'DOCUMENT 1', dateRecorded: '08/14/2007' },
   { srNo: 2, documentType: 'DOCUMENT 2', dateRecorded: '04/22/2012' },

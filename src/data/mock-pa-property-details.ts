@@ -44,10 +44,125 @@ export const MOCK_PA_PROPERTY_EXACT: PAPropertyDetails = {
   taxAssessment: '$289400',
   titleDeed:
     'Special Warranty Deed recorded on 05/13/2003 at 10:56:00 AM, Document ID 7085694',
-  streetViewUrl: '/pa-scholler-streetview-hd.jpg',
+  streetViewUrl: '/pa-6432-scholler.jpg',
   mapUrl: '/pa-scholler-map-hd.jpg',
   satelliteMapUrl: '/pa-scholler-satellite-hd.jpg',
 };
+
+export function getPAPropertyDetails(address?: string): PAPropertyDetails {
+  if (!address) return MOCK_PA_PROPERTY_EXACT;
+
+  const addrUpper = address.toUpperCase();
+
+  if (addrUpper.includes('CHEW') || addrUpper.includes('2830')) {
+    return {
+      title: '2830 W CHEW ST, Allentown City, PA, Lehigh County, Pennsylvania',
+      searchedOn: 'November 06, 2026',
+      searchId: 'a7b82140-5e3a-4932-b712-42196d884102',
+      status: 'SUCCESS',
+      location: '2830 W Chew St, Allentown, Pennsylvania 18104',
+      lots: '#14 (all), #15 (E 20 ft)',
+      area: 'West End, Allentown City',
+      property: '2830 W CHEW ST, Allentown City, PA',
+      countyState: 'Lehigh County, Pennsylvania',
+      municipality: 'City of Allentown',
+      pinParcel: '549742618901',
+      spanOfSearch: '60 years',
+      dateOfSearch: 'November 06, 2026',
+      currentOwner: 'David M. & Sarah L. Miller',
+      taxAssessment: '$342,800',
+      titleDeed: 'Special Warranty Deed recorded on 06/18/2014 at 09:14:00 AM, Doc ID 8192301',
+      streetViewUrl: '/pa-2830-chew.jpg',
+      mapUrl: '/pa-scholler-map-hd.jpg',
+      satelliteMapUrl: '/pa-scholler-satellite-hd.jpg',
+    };
+  }
+
+  if (addrUpper.includes('HILL') || addrUpper.includes('5829')) {
+    return {
+      title: '5829 HILL DR, Upper Macungie Township, PA, Lehigh County, Pennsylvania',
+      searchedOn: 'November 11, 2026',
+      searchId: 'b9d31952-4fc8-4720-91a1-53102c892401',
+      status: 'SUCCESS',
+      location: '5829 Hill Dr, Breinigsville, Pennsylvania 18031',
+      lots: '#42 (all)',
+      area: 'Upper Macungie, Lehigh County',
+      property: '5829 HILL DR, Upper Macungie Township, PA',
+      countyState: 'Lehigh County, Pennsylvania',
+      municipality: 'Township of Upper Macungie',
+      pinParcel: '547619283740',
+      spanOfSearch: '60 years',
+      dateOfSearch: 'November 11, 2026',
+      currentOwner: 'Robert & Emily Chen',
+      taxAssessment: '$495,200',
+      titleDeed: 'Special Warranty Deed recorded on 03/22/2018 at 11:30:00 AM, Doc ID 7543219',
+      streetViewUrl: '/pa-5829-hill.jpg',
+      mapUrl: '/pa-scholler-map-hd.jpg',
+      satelliteMapUrl: '/pa-scholler-satellite-hd.jpg',
+    };
+  }
+
+  if (addrUpper.includes('READING') || addrUpper.includes('2868')) {
+    return {
+      title: '2868 READING RD, Allentown City, PA, Lehigh County, Pennsylvania',
+      searchedOn: 'November 11, 2026',
+      searchId: 'f2c91834-1920-410a-8192-310948b20194',
+      status: 'SUCCESS',
+      location: '2868 Reading Rd, Allentown, Pennsylvania 18104',
+      lots: '#8 (all)',
+      area: 'Allentown City, Lehigh County',
+      property: '2868 READING RD, Allentown City, PA',
+      countyState: 'Lehigh County, Pennsylvania',
+      municipality: 'City of Allentown',
+      pinParcel: '549721039841',
+      spanOfSearch: '60 years',
+      dateOfSearch: 'November 11, 2026',
+      currentOwner: 'Marcus A. Vance',
+      taxAssessment: '$278,900',
+      titleDeed: 'Special Warranty Deed recorded on 01/15/2016 at 10:20:00 AM, Doc ID 7819204',
+      streetViewUrl: '/pa-2830-chew.jpg',
+      mapUrl: '/pa-scholler-map-hd.jpg',
+      satelliteMapUrl: '/pa-scholler-satellite-hd.jpg',
+    };
+  }
+
+  if (
+    addrUpper.includes('RHOADS') ||
+    addrUpper.includes('DRESHER') ||
+    addrUpper.includes('HEFFNER') ||
+    addrUpper.includes('HOLSTEIN')
+  ) {
+    return {
+      title: `${address}, Lehigh County, Pennsylvania`,
+      searchedOn: 'November 11, 2026',
+      searchId: 'c8f12093-8da2-4b31-901c-62948b109234',
+      status: 'SUCCESS',
+      location: `${address}, Pennsylvania`,
+      lots: '#101 (Parcel A)',
+      area: 'Northwestern Lehigh County',
+      property: address,
+      countyState: 'Lehigh County, Pennsylvania',
+      municipality: address.includes('Weisenberg') ? 'Township of Weisenberg' : 'Township of Lynn',
+      pinParcel: '541809271630',
+      spanOfSearch: '60 years',
+      dateOfSearch: 'November 11, 2026',
+      currentOwner: 'Singmaster Family Trust',
+      taxAssessment: '$412,500',
+      titleDeed: 'Special Warranty Deed recorded on 09/14/2012 at 02:45:00 PM, Doc ID 6928103',
+      streetViewUrl: '/pa-country-home.jpg',
+      mapUrl: '/pa-scholler-map-hd.jpg',
+      satelliteMapUrl: '/pa-scholler-satellite-hd.jpg',
+    };
+  }
+
+  // Default: Scholler Rd
+  return {
+    ...MOCK_PA_PROPERTY_EXACT,
+    title: `${address}, Lehigh County, Pennsylvania`,
+    property: address,
+    streetViewUrl: '/pa-6432-scholler.jpg',
+  };
+}
 
 export const MOCK_PA_DOCUMENTS_EXACT: PADocumentItem[] = [
   { srNo: 1, documentType: 'DOCUMENT 1', dateRecorded: '05/25/2010' },
