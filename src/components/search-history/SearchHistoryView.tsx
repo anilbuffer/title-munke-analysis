@@ -36,26 +36,6 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // If viewing detailed Pennsylvania property page (FULL PAGE, NOT A MODAL)
-  if (viewingPAProperty) {
-    return (
-      <PAPropertyDetailView
-        onBack={() => setViewingPAProperty(null)}
-        propertyAddress={viewingPAProperty}
-      />
-    );
-  }
-
-  // If viewing detailed New York property page (FULL PAGE, NOT A MODAL)
-  if (viewingNYProperty) {
-    return (
-      <NYPropertyDetailView
-        onBack={() => setViewingNYProperty(null)}
-        propertyAddress={viewingNYProperty}
-      />
-    );
-  }
-
   const rawData = activeTab === 'Pennsylvania' ? PENNSYLVANIA_SEARCH_HISTORY : NEW_YORK_SEARCH_HISTORY;
 
   const filteredData = useMemo(() => {
@@ -116,6 +96,28 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
       setViewingNYProperty(record.address);
     }
   };
+
+  // If viewing detailed Pennsylvania property page (FULL PAGE, NOT A MODAL)
+  // Placed AFTER all hooks to adhere to React Rules of Hooks
+  if (viewingPAProperty) {
+    return (
+      <PAPropertyDetailView
+        onBack={() => setViewingPAProperty(null)}
+        propertyAddress={viewingPAProperty}
+      />
+    );
+  }
+
+  // If viewing detailed New York property page (FULL PAGE, NOT A MODAL)
+  // Placed AFTER all hooks to adhere to React Rules of Hooks
+  if (viewingNYProperty) {
+    return (
+      <NYPropertyDetailView
+        onBack={() => setViewingNYProperty(null)}
+        propertyAddress={viewingNYProperty}
+      />
+    );
+  }
 
   return (
     <div className="relative animate-in fade-in duration-300">
