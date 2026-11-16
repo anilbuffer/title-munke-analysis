@@ -13,7 +13,6 @@ import {
   ArrowLeft,
   ChevronRight,
   X,
-  Sparkles,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -34,7 +33,6 @@ export function Sidebar({
     { name: 'Request', icon: UserSearch },
     { name: 'Advanced Search', icon: Search },
     { name: 'Search History', icon: History },
-    { name: 'AI Valuation', icon: Sparkles },
     { name: 'Agents', icon: UserRound },
     { name: 'Audit Logs', icon: Logs },
     { name: 'Settings', icon: Settings },

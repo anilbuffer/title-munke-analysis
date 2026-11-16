@@ -19,6 +19,7 @@ export interface NYPropertyDetailsExact {
   taxAssessment: string;
   streetViewUrl: string;
   mapUrl: string;
+  satelliteMapUrl: string;
 }
 
 export interface NYDocumentItemExact {
@@ -46,8 +47,9 @@ export const MOCK_NY_PROPERTY_3010_BRIGGS: NYPropertyDetailsExact = {
   bblNumber: '2032990060',
   zoning: 'R8',
   taxAssessment: '$7,843,500',
-  streetViewUrl: '/ny-briggs-streetview.jpg',
-  mapUrl: '/ny-briggs-map.jpg',
+  streetViewUrl: '/ny-briggs-streetview-hd.jpg',
+  mapUrl: '/ny-briggs-map-hd.jpg',
+  satelliteMapUrl: '/ny-briggs-satellite-hd.jpg',
 };
 
 export const MOCK_NY_DOCUMENTS_3010_BRIGGS: NYDocumentItemExact[] = [

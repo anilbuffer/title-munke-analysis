@@ -7,6 +7,7 @@ import {
   Eye,
   Maximize2,
   CheckCircle2,
+  MapPin,
 } from 'lucide-react';
 import {
   MOCK_PA_PROPERTY_EXACT,
@@ -228,83 +229,61 @@ export function PAPropertyDetailView({ onBack }: PAPropertyDetailViewProps) {
 
             {/* Right 4 Cols: Street View Box + Google Maps Card */}
             <div className="lg:col-span-4 flex flex-col gap-4">
-              {/* Street view unavailable Box */}
-              <div className="rounded-2xl border border-[#f0e8e0] bg-[#fdfbf9] h-48 sm:h-52 flex items-center justify-center p-6 text-center">
-                <span className="text-xs text-stone-400 font-medium">
-                  Street view unavailable
-                </span>
+              {/* Street View / Property Preview Box */}
+              <div className="rounded-2xl border border-[#eadfd4] overflow-hidden h-48 sm:h-52 relative group shadow-2xs bg-stone-100">
+                <img
+                  src={property.streetViewUrl}
+                  alt="6432 Scholler Rd Property Preview"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                />
+
+                {/* Property Preview UI Overlays */}
+                {/* Top-Left: Address Chip */}
+                <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5 px-2.5 py-1 bg-black/65 backdrop-blur-xs text-white rounded-md text-[11px] font-medium shadow-sm">
+                  <MapPin className="w-3 h-3 text-[#ea4335]" />
+                  <span className="truncate max-w-[160px] sm:max-w-[190px]">6432 Scholler Rd</span>
+                </div>
+
+                {/* Top-Right: Camera / Property badge */}
+                <div className="absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-full bg-black/65 backdrop-blur-xs text-white flex items-center justify-center shadow-sm">
+                  <Eye className="w-3.5 h-3.5 text-white" />
+                </div>
+
+                {/* Bottom-Left: Property Photo badge */}
+                <div className="absolute bottom-2 left-2.5 z-10 px-2 py-0.5 bg-black/60 backdrop-blur-xs text-[10px] text-white/90 rounded tracking-tight">
+                  Property Preview • Scholler Rd
+                </div>
+
+                {/* Bottom-Right: HD indicator */}
+                <div className="absolute bottom-2 right-2.5 z-10 flex items-center bg-black/65 backdrop-blur-xs text-white rounded-md text-[10px] px-1.5 py-0.5">
+                  <span>HD</span>
+                </div>
               </div>
 
               {/* Google Maps Visual Representation */}
               <div className="rounded-2xl border border-[#eadfd4] bg-[#eef6f0] h-52 sm:h-56 relative overflow-hidden shadow-2xs group">
-                {/* Simulated Google Maps Rural Roads & Terrain */}
-                <svg
-                  className="w-full h-full object-cover"
-                  viewBox="0 0 320 220"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  {/* Pale green landscape */}
-                  <rect width="320" height="220" fill="#eaf3ec" />
-
-                  {/* Water stream / creek line */}
-                  <path
-                    d="M-10 160 C 40 170, 70 180, 100 200 C 130 220, 150 240, 160 260"
-                    stroke="#bcdbf0"
-                    strokeWidth="4"
-                    fill="none"
-                  />
-
-                  {/* Rural Roads (Lynn Key Rd & Scholler Rd) */}
-                  <path
-                    d="M-20 180 C 40 190, 80 185, 110 170 C 150 150, 170 120, 185 80 C 200 40, 210 10, 220 -20"
-                    stroke="#c6d8cb"
-                    strokeWidth="3.5"
-                    fill="none"
-                  />
-                  <path
-                    d="M110 170 C 130 150, 160 135, 180 130 C 210 120, 260 90, 330 60"
-                    stroke="#ffffff"
-                    strokeWidth="3"
-                    fill="none"
-                  />
-                  <path
-                    d="M175 130 L 195 105 L 245 95"
-                    stroke="#ffffff"
-                    strokeWidth="2.5"
-                    strokeDasharray="2 2"
-                    fill="none"
-                  />
-
-                  {/* Road Names */}
-                  <text
-                    x="20"
-                    y="195"
-                    fontSize="7"
-                    fill="#758878"
-                    transform="rotate(-25, 20, 195)"
-                    fontFamily="sans-serif"
-                  >
-                    Lynn Key Rd
-                  </text>
-                  <circle cx="168" cy="205" r="5" fill="#ffffff" stroke="#9bb1a1" strokeWidth="0.8" />
-                  <text x="164" y="207" fontSize="5.5" fill="#445548" fontWeight="bold">863</text>
-                </svg>
+                <img
+                  src={mapType === 'Map' ? property.mapUrl : property.satelliteMapUrl}
+                  alt="6432 Scholler Rd Parcel Map"
+                  className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
+                />
 
                 {/* Google Maps Controls */}
                 {/* Top Left: Map / Satellite Button */}
                 <div className="absolute top-2.5 left-2.5 z-20 flex bg-white rounded-md shadow-xs border border-stone-200 overflow-hidden text-[10px] font-medium text-stone-700">
                   <button
+                    type="button"
                     onClick={() => setMapType('Map')}
-                    className={`px-2.5 py-1 transition-colors cursor-pointer ${mapType === 'Map' ? 'font-bold text-stone-900 bg-stone-50' : 'hover:bg-stone-50'
+                    className={`px-2.5 py-1 transition-colors cursor-pointer ${mapType === 'Map' ? 'font-bold text-stone-900 bg-stone-100' : 'hover:bg-stone-50'
                       }`}
                   >
                     Map
                   </button>
                   <div className="w-px bg-stone-200" />
                   <button
+                    type="button"
                     onClick={() => setMapType('Satellite')}
-                    className={`px-2.5 py-1 transition-colors cursor-pointer ${mapType === 'Satellite' ? 'font-bold text-stone-900 bg-stone-50' : 'hover:bg-stone-50'
+                    className={`px-2.5 py-1 transition-colors cursor-pointer ${mapType === 'Satellite' ? 'font-bold text-stone-900 bg-stone-100' : 'hover:bg-stone-50'
                       }`}
                   >
                     Satellite
@@ -328,8 +307,8 @@ export function PAPropertyDetailView({ onBack }: PAPropertyDetailViewProps) {
                 </div>
 
                 {/* Bottom Left: Google Logo */}
-                <div className="absolute bottom-1.5 left-2 z-20">
-                  <span className="font-bold text-xs tracking-tighter text-stone-600 select-none">
+                <div className="absolute bottom-1.5 left-2 z-20 bg-white/80 backdrop-blur-xs px-1.5 py-0.5 rounded shadow-2xs">
+                  <span className="font-bold text-xs tracking-tighter select-none">
                     <span className="text-[#4285F4]">G</span>
                     <span className="text-[#EA4335]">o</span>
                     <span className="text-[#FBBC05]">o</span>
@@ -340,12 +319,8 @@ export function PAPropertyDetailView({ onBack }: PAPropertyDetailViewProps) {
                 </div>
 
                 {/* Bottom Right: Map attribution */}
-                <div className="absolute bottom-1 right-2 z-20 flex items-center gap-1.5 text-[8px] text-stone-500 bg-white/70 px-1.5 py-0.5 rounded backdrop-blur-2xs select-none">
-                  <span>Map Data</span>
-                  <span>&bull;</span>
-                  <span>Terms</span>
-                  <span>&bull;</span>
-                  <span>Report a map error</span>
+                <div className="absolute bottom-1.5 right-2 z-20 text-[9px] text-stone-700 bg-white/80 backdrop-blur-xs px-1 rounded shadow-2xs">
+                  Map data ©2026
                 </div>
               </div>
             </div>

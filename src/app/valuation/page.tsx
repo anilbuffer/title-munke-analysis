@@ -11,7 +11,6 @@ export default function ValuationPage() {
   const router = useRouter();
 
   const handleNavSelect = (item: string) => {
-    if (item === 'AI Valuation') return;
     if (item === 'Settings') {
       router.push('/');
     } else if (item === 'Search History') {
@@ -27,7 +26,7 @@ export default function ValuationPage() {
       <Sidebar
         isMobileOpen={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
-        activeNavItem="AI Valuation"
+        activeNavItem="Search History"
         onSelectNav={handleNavSelect}
       />
 
@@ -36,7 +35,7 @@ export default function ValuationPage() {
         {/* Top Header Card */}
         <div className="mb-5">
           <Header
-            activeNav="AI Valuation"
+            activeNav="Search History"
             onToggleSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
           />
         </div>

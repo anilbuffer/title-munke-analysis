@@ -15,6 +15,9 @@ export interface PAPropertyDetails {
   currentOwner: string;
   taxAssessment: string;
   titleDeed: string;
+  streetViewUrl: string;
+  mapUrl: string;
+  satelliteMapUrl: string;
 }
 
 export interface PADocumentItem {
@@ -41,6 +44,9 @@ export const MOCK_PA_PROPERTY_EXACT: PAPropertyDetails = {
   taxAssessment: '$289400',
   titleDeed:
     'Special Warranty Deed recorded on 05/13/2003 at 10:56:00 AM, Document ID 7085694',
+  streetViewUrl: '/pa-scholler-streetview-hd.jpg',
+  mapUrl: '/pa-scholler-map-hd.jpg',
+  satelliteMapUrl: '/pa-scholler-satellite-hd.jpg',
 };
 
 export const MOCK_PA_DOCUMENTS_EXACT: PADocumentItem[] = [

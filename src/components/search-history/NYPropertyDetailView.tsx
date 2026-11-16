@@ -7,6 +7,9 @@ import {
   Eye,
   Info,
   CheckCircle2,
+  Compass,
+  MapPin,
+  Maximize2,
 } from 'lucide-react';
 import {
   MOCK_NY_PROPERTY_3010_BRIGGS,
@@ -26,6 +29,7 @@ export function NYPropertyDetailView({ onBack }: NYPropertyDetailViewProps) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [isViewingValuation, setIsViewingValuation] = useState(false);
+  const [mapType, setMapType] = useState<'Map' | 'Satellite'>('Map');
 
   const property = MOCK_NY_PROPERTY_3010_BRIGGS;
   const docs = [...MOCK_NY_DOCUMENTS_3010_BRIGGS].sort((a, b) => {
@@ -268,17 +272,99 @@ export function NYPropertyDetailView({ onBack }: NYPropertyDetailViewProps) {
                 <img
                   src={property.streetViewUrl}
                   alt="3010 Briggs Avenue Street View"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                 />
+
+                {/* Street View Authentic UI Overlays */}
+                {/* Top-Left: Address Chip */}
+                <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5 px-2.5 py-1 bg-black/65 backdrop-blur-xs text-white rounded-md text-[11px] font-medium shadow-sm">
+                  <MapPin className="w-3 h-3 text-[#ea4335]" />
+                  <span className="truncate max-w-[150px] sm:max-w-[180px]">3010 Briggs Ave</span>
+                </div>
+
+                {/* Top-Right: Street View 360 Compass Icon */}
+                <div className="absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-full bg-black/65 backdrop-blur-xs text-white flex items-center justify-center shadow-sm">
+                  <Compass className="w-4 h-4 text-white" />
+                </div>
+
+                {/* Bottom-Left: Street View Badge */}
+                <div className="absolute bottom-2 left-2.5 z-10 px-2 py-0.5 bg-black/60 backdrop-blur-xs text-[10px] text-white/90 rounded tracking-tight">
+                  Google Street View
+                </div>
+
+                {/* Bottom-Right: 360 viewer indicator */}
+                <div className="absolute bottom-2 right-2.5 z-10 flex items-center bg-black/65 backdrop-blur-xs text-white rounded-md text-[10px] px-1.5 py-0.5">
+                  <span>360°</span>
+                </div>
               </div>
 
               {/* Google Maps Box */}
               <div className="rounded-2xl border border-[#eadfd4] overflow-hidden h-52 sm:h-56 relative group shadow-2xs bg-[#eef6f0]">
                 <img
-                  src={property.mapUrl}
+                  src={mapType === 'Map' ? property.mapUrl : property.satelliteMapUrl}
                   alt="3010 Briggs Avenue Parcel Map"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
                 />
+
+                {/* Top-Left: Map / Satellite switcher */}
+                <div className="absolute top-2.5 left-2.5 z-20 flex bg-white rounded-md shadow-xs border border-stone-200 overflow-hidden text-[10px] font-medium text-stone-700">
+                  <button
+                    type="button"
+                    onClick={() => setMapType('Map')}
+                    className={`px-2.5 py-1 transition-colors cursor-pointer ${
+                      mapType === 'Map'
+                        ? 'font-bold text-stone-900 bg-stone-100'
+                        : 'hover:bg-stone-50'
+                    }`}
+                  >
+                    Map
+                  </button>
+                  <div className="w-px bg-stone-200" />
+                  <button
+                    type="button"
+                    onClick={() => setMapType('Satellite')}
+                    className={`px-2.5 py-1 transition-colors cursor-pointer ${
+                      mapType === 'Satellite'
+                        ? 'font-bold text-stone-900 bg-stone-100'
+                        : 'hover:bg-stone-50'
+                    }`}
+                  >
+                    Satellite
+                  </button>
+                </div>
+
+                {/* Top-Right: Fullscreen Toggle */}
+                <div className="absolute top-2.5 right-2.5 z-20 bg-white p-1 rounded-md shadow-xs border border-stone-200 text-stone-600 hover:text-stone-900 cursor-pointer">
+                  <Maximize2 className="w-3.5 h-3.5" />
+                </div>
+
+                {/* Centered Red Location Pin */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[85%] z-20 pointer-events-none drop-shadow-md">
+                  <svg width="28" height="36" viewBox="0 0 24 32" fill="none">
+                    <path
+                      d="M12 0C5.37 0 0 5.37 0 12C0 21 12 32 12 32C12 32 24 21 24 12C24 5.37 18.63 0 12 0Z"
+                      fill="#ea4335"
+                    />
+                    <circle cx="12" cy="11" r="4.5" fill="#a50e0e" />
+                  </svg>
+                </div>
+
+                {/* Bottom Left: Google Logo */}
+                <div className="absolute bottom-1.5 left-2 z-20 bg-white/80 backdrop-blur-xs px-1.5 py-0.5 rounded shadow-2xs">
+                  <span className="font-bold text-xs tracking-tighter select-none">
+                    <span className="text-[#4285F4]">G</span>
+                    <span className="text-[#EA4335]">o</span>
+                    <span className="text-[#FBBC05]">o</span>
+                    <span className="text-[#4285F4]">g</span>
+                    <span className="text-[#34A853]">l</span>
+                    <span className="text-[#EA4335]">e</span>
+                  </span>
+                </div>
+
+                {/* Bottom Right: Map attribution */}
+                <div className="absolute bottom-1.5 right-2 z-20 text-[9px] text-stone-700 bg-white/80 backdrop-blur-xs px-1 rounded shadow-2xs">
+                  Map data ©2026
+                </div>
               </div>
             </div>
           </div>
