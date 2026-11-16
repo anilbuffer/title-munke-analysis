@@ -11,7 +11,9 @@ export default function ValuationPage() {
   const router = useRouter();
 
   const handleNavSelect = (item: string) => {
-    if (item === 'Settings') {
+    if (item === 'AI Opportunity') {
+      router.push('/ai-opportunity');
+    } else if (item === 'Settings') {
       router.push('/');
     } else if (item === 'Search History') {
       router.push('/search-history');

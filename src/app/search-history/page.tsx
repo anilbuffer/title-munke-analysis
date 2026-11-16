@@ -10,8 +10,14 @@ export default function SearchHistoryPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const router = useRouter();
 
-  const handleNavSelect = () => {
-    // Only Search History is enabled
+  const handleNavSelect = (item: string) => {
+    if (item === 'AI Opportunity') {
+      router.push('/ai-opportunity');
+    } else if (item === 'Settings') {
+      router.push('/');
+    } else if (item !== 'Search History') {
+      router.push(`/?tab=${encodeURIComponent(item)}`);
+    }
   };
 
   return (

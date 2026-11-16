@@ -13,6 +13,7 @@ import {
   ArrowLeft,
   ChevronRight,
   X,
+  Sparkles,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -33,6 +34,7 @@ export function Sidebar({
     { name: 'Request', icon: UserSearch },
     { name: 'Advanced Search', icon: Search },
     { name: 'Search History', icon: History },
+    { name: 'AI Opportunity', icon: Sparkles },
     { name: 'Agents', icon: UserRound },
     { name: 'Audit Logs', icon: Logs },
     { name: 'Settings', icon: Settings },
@@ -50,9 +52,8 @@ export function Sidebar({
 
       {/* Sidebar Panel */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 w-64 lg:w-72 bg-[#f5f0ec] p-5 flex flex-col justify-between border-r lg:border border-[#eadfd4] lg:rounded-3xl lg:my-4 lg:ml-4 lg:h-[calc(100vh-2rem)] transition-transform duration-300 shadow-xs overflow-y-auto custom-scrollbar ${
-          isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
+        className={`fixed top-0 bottom-0 left-0 z-40 w-64 lg:w-72 bg-[#f5f0ec] p-5 flex flex-col justify-between border-r lg:border border-[#eadfd4] lg:rounded-3xl lg:my-4 lg:ml-4 lg:h-[calc(100vh-2rem)] transition-transform duration-300 shadow-xs overflow-y-auto custom-scrollbar ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          }`}
       >
         {/* Top: Brand Logo & Navigation */}
         <div className="flex flex-col">
@@ -91,22 +92,19 @@ export function Sidebar({
                 <button
                   key={item.name}
                   onClick={() => {
-                    // Only allow accessing Search History
-                    if (item.name === 'Search History') {
-                      onSelectNav && onSelectNav(item.name);
+                    if (onSelectNav) {
+                      onSelectNav(item.name);
                     }
                     if (onCloseMobile) onCloseMobile();
                   }}
-                  className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[15px] font-medium transition-all duration-200 text-left cursor-pointer ${
-                    isActive
+                  className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[15px] font-medium transition-all duration-200 text-left cursor-pointer ${isActive
                       ? 'bg-[#550000] text-white shadow-sm shadow-[#550000]/25'
                       : 'text-[#3d2014] hover:text-[#23120b] hover:bg-[#ebdfd3]'
-                  }`}
+                    }`}
                 >
                   <Icon
-                    className={`w-5 h-5 shrink-0 ${
-                      isActive ? 'text-white' : 'text-[#3d2014]'
-                    }`}
+                    className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-[#3d2014]'
+                      }`}
                     strokeWidth={1.8}
                   />
                   <span className="font-sans font-medium tracking-wide">

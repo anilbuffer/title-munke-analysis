@@ -17,6 +17,7 @@ import { AddTokensModal } from '@/components/ai-settings/AddTokensModal';
 import { ToastContainer } from '@/components/ai-settings/Toast';
 import { SearchHistoryView } from '@/components/search-history/SearchHistoryView';
 import { AIPropertyValuationView } from '@/components/valuation/AIPropertyValuationView';
+import { AIOpportunityView } from '@/components/ai-opportunity/AIOpportunityView';
 import {
   User,
   CreditCard,
@@ -76,11 +77,9 @@ export default function AISettingsPage() {
       <Sidebar
         isMobileOpen={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
-        activeNavItem="Search History"
+        activeNavItem={activeNav}
         onSelectNav={(item) => {
-          if (item === 'Search History') {
-            setActiveNav('Search History');
-          }
+          setActiveNav(item);
         }}
       />
 
@@ -90,12 +89,12 @@ export default function AISettingsPage() {
         {/* Top Header Card */}
         <div className="mb-5">
           <Header
-            activeNav="Search History"
+            activeNav={activeNav}
             onToggleSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
           />
         </div>
 
-        {/* Main Content Area: Exclusively Search History and its full interactive flow */}
+        {/* Main Content Area */}
         <main className="flex-1 pb-8">
           {/* Active Flow: Search History */}
           {activeNav === 'Search History' && (
@@ -105,6 +104,13 @@ export default function AISettingsPage() {
                   window.history.back();
                 }
               }}
+            />
+          )}
+
+          {/* Active Flow: AI Opportunity */}
+          {activeNav === 'AI Opportunity' && (
+            <AIOpportunityView
+              onBack={() => setActiveNav('Search History')}
             />
           )}
 
