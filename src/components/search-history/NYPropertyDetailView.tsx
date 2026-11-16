@@ -11,8 +11,10 @@ import {
 import {
   MOCK_NY_PROPERTY_3010_BRIGGS,
   MOCK_NY_DOCUMENTS_3010_BRIGGS,
+  MOCK_NY_VALUATION_DATA,
   NYDocumentItemExact,
 } from '@/data/mock-ny-property-details';
+import { AIPropertyValuationCard } from './AIPropertyValuationCard';
 
 interface NYPropertyDetailViewProps {
   onBack: () => void;
@@ -270,6 +272,9 @@ export function NYPropertyDetailView({ onBack }: NYPropertyDetailViewProps) {
             </div>
           </div>
         </div>
+
+        {/* Section: AI Property Valuation Engine */}
+        <AIPropertyValuationCard data={MOCK_NY_VALUATION_DATA} />
 
         {/* Section: Document Processing Status */}
         <div className="mt-8 pt-6 border-t border-[#f0e8e0]">

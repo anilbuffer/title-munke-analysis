@@ -60,6 +60,51 @@ export const MOCK_NY_DOCUMENTS_3010_BRIGGS: NYDocumentItemExact[] = [
   { srNo: 7, documentType: 'DOCUMENT 7', dateRecorded: '11/16/2026' },
 ];
 
+export const MOCK_NY_VALUATION_DATA = {
+  state: 'NY' as const,
+  propertyAddress: '3010 BRIGGS AVENUE, BX, New York City',
+  marketValue: 11250000,
+  lowRange: 10800000,
+  highRange: 11700000,
+  pricePerSqFt: 122,
+  medianPricePerSqFt: 115,
+  taxAssessment: 7843500,
+  assessmentRatio: 69.7,
+  confidenceScore: 95.4,
+  titleLiquidityScore: 98,
+  yoyAppreciation: 6.8,
+  comps: [
+    {
+      address: '3025 Briggs Ave, Bronx, NY',
+      salePrice: '$1,280,000',
+      saleDate: '09/14/2026',
+      distance: '0.08 mi',
+      similarity: 97,
+    },
+    {
+      address: '2980 Grand Concourse, Bronx, NY',
+      salePrice: '$2,150,000',
+      saleDate: '07/22/2026',
+      distance: '0.22 mi',
+      similarity: 94,
+    },
+    {
+      address: '280 E 198th St, Bronx, NY',
+      salePrice: '$945,000',
+      saleDate: '05/18/2026',
+      distance: '0.18 mi',
+      similarity: 92,
+    },
+    {
+      address: '3050 Bainbridge Ave, Bronx, NY',
+      salePrice: '$1,820,000',
+      saleDate: '03/11/2026',
+      distance: '0.35 mi',
+      similarity: 90,
+    },
+  ],
+};
+
 // Backward-compatible exports
 export interface NYPropertyOverview {
   address: string;

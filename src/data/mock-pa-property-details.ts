@@ -53,6 +53,51 @@ export const MOCK_PA_DOCUMENTS_EXACT: PADocumentItem[] = [
   { srNo: 7, documentType: 'DOCUMENT 7', dateRecorded: '11/12/2026' },
 ];
 
+export const MOCK_PA_VALUATION_DATA = {
+  state: 'PA' as const,
+  propertyAddress: '6432 SCHOLLER RD, Lynn Township, PA',
+  marketValue: 445000,
+  lowRange: 425000,
+  highRange: 465000,
+  pricePerSqFt: 188,
+  medianPricePerSqFt: 179,
+  taxAssessment: 289400,
+  assessmentRatio: 65.0,
+  confidenceScore: 96.2,
+  titleLiquidityScore: 99,
+  yoyAppreciation: 5.4,
+  comps: [
+    {
+      address: '6410 Scholler Rd, Lynn Township, PA',
+      salePrice: '$430,000',
+      saleDate: '08/20/2026',
+      distance: '0.12 mi',
+      similarity: 96,
+    },
+    {
+      address: '5815 Hill Dr, Upper Macungie, PA',
+      salePrice: '$495,000',
+      saleDate: '06/15/2026',
+      distance: '0.45 mi',
+      similarity: 93,
+    },
+    {
+      address: '7620 Dresher Rd, Lynn Township, PA',
+      salePrice: '$460,000',
+      saleDate: '04/10/2026',
+      distance: '0.60 mi',
+      similarity: 91,
+    },
+    {
+      address: '4060 Rhoads Rd, Weisenberg Township, PA',
+      salePrice: '$415,000',
+      saleDate: '02/08/2026',
+      distance: '0.78 mi',
+      similarity: 89,
+    },
+  ],
+};
+
 // Backward-compatible exports
 export interface PAPropertyOverview {
   address: string;

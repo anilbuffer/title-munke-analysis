@@ -11,8 +11,10 @@ import {
 import {
   MOCK_PA_PROPERTY_EXACT,
   MOCK_PA_DOCUMENTS_EXACT,
+  MOCK_PA_VALUATION_DATA,
   PADocumentItem,
 } from '@/data/mock-pa-property-details';
+import { AIPropertyValuationCard } from './AIPropertyValuationCard';
 
 interface PAPropertyDetailViewProps {
   onBack: () => void;
@@ -338,6 +340,9 @@ export function PAPropertyDetailView({ onBack }: PAPropertyDetailViewProps) {
             </div>
           </div>
         </div>
+
+        {/* Section: AI Property Valuation Engine */}
+        <AIPropertyValuationCard data={MOCK_PA_VALUATION_DATA} />
 
         {/* Section: Document Processing Status */}
         <div className="mt-8 pt-6 border-t border-[#f0e8e0]">
