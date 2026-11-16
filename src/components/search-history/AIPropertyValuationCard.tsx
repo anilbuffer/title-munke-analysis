@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import { Sparkles, CheckCircle2 } from 'lucide-react';
 
 export interface AIPropertyValuationData {
   state?: 'NY' | 'PA' | string;
@@ -20,21 +20,51 @@ export function AIPropertyValuationCard({
   title = 'AI Property Valuation Engine',
   description = 'Automated valuation model analyzing real-time deed recordings, tax assessment data, and market comparables.',
 }: AIPropertyValuationCardProps) {
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleValuationClick = () => {
+    setIsLoading(true);
+    setToastMessage('Running AI Property Valuation analysis...');
+    setTimeout(() => {
+      setIsLoading(false);
+      setToastMessage('AI Property Valuation complete.');
+      setTimeout(() => setToastMessage(null), 3000);
+    }, 1200);
+  };
+
   return (
     <div className="mt-8 pt-6 border-t border-[#f0e8e0]">
-      <div className="bg-[#fbf7f4] border border-[#eadfd4] rounded-2xl p-5 sm:p-6 shadow-2xs">
-        <div className="flex items-start sm:items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-[#550000] text-white flex items-center justify-center shrink-0 shadow-2xs mt-0.5 sm:mt-0">
-            <Sparkles className="w-5 h-5 text-amber-300" />
-          </div>
-          <div>
-            <h2 className="text-base sm:text-lg font-bold text-[#3d2014] tracking-tight">
-              {title}
-            </h2>
-            <p className="text-xs sm:text-sm text-stone-600 mt-1">
-              {description}
-            </p>
-          </div>
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed top-6 right-6 z-50 bg-[#3d2014] text-white px-4 py-2.5 rounded-xl shadow-lg border border-[#6b453a] flex items-center gap-2 text-xs sm:text-sm animate-in slide-in-from-top-4">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      <div className="bg-[#fbf7f4] border border-[#eadfd4] rounded-2xl p-6 sm:p-8 shadow-2xs text-center flex flex-col items-center justify-center">
+        {/* Centered Title */}
+        <h2 className="text-base sm:text-lg font-bold text-[#3d2014] tracking-tight">
+          {title}
+        </h2>
+
+        {/* Centered Short Description */}
+        <p className="text-xs sm:text-sm text-stone-600 mt-1.5 max-w-xl mx-auto">
+          {description}
+        </p>
+
+        {/* Centered [AI Property Valuation] Button */}
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={handleValuationClick}
+            disabled={isLoading}
+            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-xs sm:text-sm font-medium bg-[#550000] text-white hover:bg-[#400000] transition-all duration-200 shadow-xs shadow-[#550000]/20 active:scale-[0.98] cursor-pointer disabled:opacity-70"
+          >
+            <Sparkles className={`w-4 h-4 text-amber-300 ${isLoading ? 'animate-spin' : ''}`} />
+            <span>{isLoading ? 'Analyzing Valuation...' : 'AI Property Valuation'}</span>
+          </button>
         </div>
       </div>
     </div>
