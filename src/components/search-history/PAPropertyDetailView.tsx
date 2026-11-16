@@ -8,6 +8,8 @@ import {
   Maximize2,
   CheckCircle2,
   MapPin,
+  Compass,
+  ExternalLink,
 } from 'lucide-react';
 import {
   MOCK_PA_PROPERTY_EXACT,
@@ -23,13 +25,21 @@ interface PAPropertyDetailViewProps {
   propertyAddress?: string;
 }
 
-export function PAPropertyDetailView({ onBack }: PAPropertyDetailViewProps) {
+export function PAPropertyDetailView({
+  onBack,
+  propertyAddress,
+}: PAPropertyDetailViewProps) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [mapType, setMapType] = useState<'Map' | 'Satellite'>('Map');
   const [isViewingValuation, setIsViewingValuation] = useState(false);
 
   const property = MOCK_PA_PROPERTY_EXACT;
+  const displayAddress = propertyAddress || property.property || '6432 SCHOLLER RD, Lynn Township, PA';
+  const displayTitle = propertyAddress
+    ? `${propertyAddress}, Lehigh County, Pennsylvania`
+    : property.title;
+
   const docs = [...MOCK_PA_DOCUMENTS_EXACT].sort((a, b) => {
     return sortOrder === 'asc'
       ? a.dateRecorded.localeCompare(b.dateRecorded)
@@ -49,7 +59,7 @@ export function PAPropertyDetailView({ onBack }: PAPropertyDetailViewProps) {
     return (
       <AIPropertyValuationView
         onBack={() => setIsViewingValuation(false)}
-        initialPropertyAddress="3010 BRIGGS AVENUE, BX, New York City"
+        initialPropertyAddress={displayAddress}
       />
     );
   }
@@ -81,7 +91,7 @@ export function PAPropertyDetailView({ onBack }: PAPropertyDetailViewProps) {
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-[#f0e8e0] pb-5">
           <div>
             <h1 className="text-lg sm:text-xl font-bold text-[#3d2014] tracking-tight">
-              {property.title}
+              {displayTitle}
             </h1>
             <p className="text-xs text-[#8c7b75] mt-1.5 font-normal">
               Searched on:{' '}
@@ -144,7 +154,7 @@ export function PAPropertyDetailView({ onBack }: PAPropertyDetailViewProps) {
                     PROPERTY
                   </span>
                   <span className="text-xs text-stone-600 mt-1 block">
-                    {property.property}
+                    {displayAddress.split(',')[0]}
                   </span>
                 </div>
 
@@ -233,49 +243,77 @@ export function PAPropertyDetailView({ onBack }: PAPropertyDetailViewProps) {
               <div className="rounded-2xl border border-[#eadfd4] overflow-hidden h-48 sm:h-52 relative group shadow-2xs bg-stone-100">
                 <img
                   src={property.streetViewUrl}
-                  alt="6432 Scholler Rd Property Preview"
+                  alt={`${displayAddress} Property Preview`}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                 />
 
                 {/* Property Preview UI Overlays */}
                 {/* Top-Left: Address Chip */}
-                <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5 px-2.5 py-1 bg-black/65 backdrop-blur-xs text-white rounded-md text-[11px] font-medium shadow-sm">
+                <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5 px-2.5 py-1 bg-black/70 backdrop-blur-xs text-white rounded-md text-[11px] font-medium shadow-sm">
                   <MapPin className="w-3 h-3 text-[#ea4335]" />
-                  <span className="truncate max-w-[160px] sm:max-w-[190px]">6432 Scholler Rd</span>
+                  <span className="truncate max-w-[150px] sm:max-w-[180px]">{displayAddress.split(',')[0]}</span>
                 </div>
 
-                {/* Top-Right: Camera / Property badge */}
-                <div className="absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-full bg-black/65 backdrop-blur-xs text-white flex items-center justify-center shadow-sm">
-                  <Eye className="w-3.5 h-3.5 text-white" />
+                {/* Top-Right: Open in Google Maps / Street View */}
+                <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      window.open(
+                        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(displayAddress)}`,
+                        '_blank'
+                      )
+                    }
+                    title="Open live Google Maps in new tab"
+                    className="w-7 h-7 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-xs text-white flex items-center justify-center shadow-sm cursor-pointer transition-colors"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-white" />
+                  </button>
                 </div>
 
                 {/* Bottom-Left: Property Photo badge */}
-                <div className="absolute bottom-2 left-2.5 z-10 px-2 py-0.5 bg-black/60 backdrop-blur-xs text-[10px] text-white/90 rounded tracking-tight">
-                  Property Preview • Scholler Rd
+                <div className="absolute bottom-2.5 left-2.5 z-10 px-2 py-0.5 bg-black/65 backdrop-blur-xs text-[10px] text-white/90 rounded tracking-tight">
+                  Property Preview • Rural Residential
                 </div>
 
-                {/* Bottom-Right: HD indicator */}
-                <div className="absolute bottom-2 right-2.5 z-10 flex items-center bg-black/65 backdrop-blur-xs text-white rounded-md text-[10px] px-1.5 py-0.5">
-                  <span>HD</span>
-                </div>
+                {/* Bottom-Right: Interactive Explore 360 Button */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    window.open(
+                      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(displayAddress)}`,
+                      '_blank'
+                    )
+                  }
+                  className="absolute bottom-2.5 right-2.5 z-10 flex items-center gap-1 bg-[#550000] hover:bg-[#6b0000] text-white rounded-md text-[10px] px-2 py-0.5 shadow-sm transition-colors cursor-pointer"
+                >
+                  <Compass className="w-3 h-3" />
+                  <span>Explore 360°</span>
+                </button>
               </div>
 
-              {/* Google Maps Visual Representation */}
-              <div className="rounded-2xl border border-[#eadfd4] bg-[#eef6f0] h-52 sm:h-56 relative overflow-hidden shadow-2xs group">
-                <img
-                  src={mapType === 'Map' ? property.mapUrl : property.satelliteMapUrl}
-                  alt="6432 Scholler Rd Parcel Map"
-                  className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
+              {/* Google Maps Box: Live & Functional based on Property Address */}
+              <div className="rounded-2xl border border-[#eadfd4] overflow-hidden h-56 sm:h-64 relative group shadow-2xs bg-[#eef6f0]">
+                {/* Live Functional Google Map Iframe for displayAddress */}
+                <iframe
+                  title={`Live Google Map for ${displayAddress}`}
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(displayAddress)}&t=${mapType === 'Satellite' ? 'k' : 'm'}&z=16&ie=UTF8&iwloc=&output=embed`}
+                  className="w-full h-full border-0"
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
                 />
 
-                {/* Google Maps Controls */}
-                {/* Top Left: Map / Satellite Button */}
-                <div className="absolute top-2.5 left-2.5 z-20 flex bg-white rounded-md shadow-xs border border-stone-200 overflow-hidden text-[10px] font-medium text-stone-700">
+                {/* Top-Left: Map / Satellite switcher */}
+                <div className="absolute top-2.5 left-2.5 z-20 flex bg-white/95 backdrop-blur-xs rounded-md shadow-xs border border-stone-200 overflow-hidden text-[10px] font-medium text-stone-700">
                   <button
                     type="button"
                     onClick={() => setMapType('Map')}
-                    className={`px-2.5 py-1 transition-colors cursor-pointer ${mapType === 'Map' ? 'font-bold text-stone-900 bg-stone-100' : 'hover:bg-stone-50'
-                      }`}
+                    className={`px-2.5 py-1 transition-colors cursor-pointer ${
+                      mapType === 'Map'
+                        ? 'font-bold text-stone-900 bg-stone-100 shadow-2xs'
+                        : 'hover:bg-stone-50'
+                    }`}
                   >
                     Map
                   </button>
@@ -283,45 +321,30 @@ export function PAPropertyDetailView({ onBack }: PAPropertyDetailViewProps) {
                   <button
                     type="button"
                     onClick={() => setMapType('Satellite')}
-                    className={`px-2.5 py-1 transition-colors cursor-pointer ${mapType === 'Satellite' ? 'font-bold text-stone-900 bg-stone-100' : 'hover:bg-stone-50'
-                      }`}
+                    className={`px-2.5 py-1 transition-colors cursor-pointer ${
+                      mapType === 'Satellite'
+                        ? 'font-bold text-stone-900 bg-stone-100 shadow-2xs'
+                        : 'hover:bg-stone-50'
+                    }`}
                   >
                     Satellite
                   </button>
                 </div>
 
-                {/* Top Right: Fullscreen Toggle */}
-                <div className="absolute top-2.5 right-2.5 z-20 bg-white p-1 rounded-md shadow-xs border border-stone-200 text-stone-600 hover:text-stone-900 cursor-pointer">
+                {/* Top-Right: Fullscreen / Open in Google Maps */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    window.open(
+                      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(displayAddress)}`,
+                      '_blank'
+                    )
+                  }
+                  title="Open live Google Maps in new tab"
+                  className="absolute top-2.5 right-2.5 z-20 bg-white/95 hover:bg-white backdrop-blur-xs p-1.5 rounded-md shadow-xs border border-stone-200 text-stone-600 hover:text-stone-900 cursor-pointer transition-colors"
+                >
                   <Maximize2 className="w-3.5 h-3.5" />
-                </div>
-
-                {/* Centered Red Location Pin */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[85%] z-20 pointer-events-none drop-shadow-md">
-                  <svg width="28" height="36" viewBox="0 0 24 32" fill="none">
-                    <path
-                      d="M12 0C5.37 0 0 5.37 0 12C0 21 12 32 12 32C12 32 24 21 24 12C24 5.37 18.63 0 12 0Z"
-                      fill="#ea4335"
-                    />
-                    <circle cx="12" cy="11" r="4.5" fill="#a50e0e" />
-                  </svg>
-                </div>
-
-                {/* Bottom Left: Google Logo */}
-                <div className="absolute bottom-1.5 left-2 z-20 bg-white/80 backdrop-blur-xs px-1.5 py-0.5 rounded shadow-2xs">
-                  <span className="font-bold text-xs tracking-tighter select-none">
-                    <span className="text-[#4285F4]">G</span>
-                    <span className="text-[#EA4335]">o</span>
-                    <span className="text-[#FBBC05]">o</span>
-                    <span className="text-[#4285F4]">g</span>
-                    <span className="text-[#34A853]">l</span>
-                    <span className="text-[#EA4335]">e</span>
-                  </span>
-                </div>
-
-                {/* Bottom Right: Map attribution */}
-                <div className="absolute bottom-1.5 right-2 z-20 text-[9px] text-stone-700 bg-white/80 backdrop-blur-xs px-1 rounded shadow-2xs">
-                  Map data ©2026
-                </div>
+                </button>
               </div>
             </div>
           </div>
