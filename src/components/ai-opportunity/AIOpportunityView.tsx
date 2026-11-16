@@ -78,6 +78,14 @@ export function AIOpportunityView({
     // On clicking marker, highlight card
   };
 
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else if (typeof window !== 'undefined' && window.history.length > 1) {
+      window.history.back();
+    }
+  };
+
   // 1. If viewing Full AI Property Valuation Engine
   if (viewingValuationAddress) {
     return (
@@ -113,18 +121,16 @@ export function AIOpportunityView({
   // 4. Default: Finder View (Image 1)
   return (
     <div className="w-full space-y-6 animate-in fade-in duration-200">
-      {/* Top Back Navigation Bar if onBack is provided */}
-      {onBack && (
-        <div className="bg-[#ede4db] rounded-2xl px-5 py-3 flex items-center border border-[#e2d7cc] shadow-2xs">
-          <button
-            onClick={onBack}
-            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors cursor-pointer group"
-          >
-            <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-            <span>Back</span>
-          </button>
-        </div>
-      )}
+      {/* Top Beige Navigation Banner matching Title Munke consistency: < Back */}
+      <div className="bg-[#ede4db] rounded-2xl px-5 py-3 flex items-center border border-[#e2d7cc] shadow-2xs">
+        <button
+          onClick={handleBack}
+          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors cursor-pointer group"
+        >
+          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+          <span>Back</span>
+        </button>
+      </div>
 
       {/* Main Container Card */}
       <div className="bg-white rounded-3xl border border-[#eadfd4] p-6 sm:p-8 shadow-xs">

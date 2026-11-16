@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import {
-  ArrowLeft,
+  ChevronLeft,
   Sparkles,
   TrendingUp,
   Building2,
@@ -47,17 +47,17 @@ export function PropertyDetailCard({
         </div>
       )}
 
-      {/* Top: Back to Finder button matching Image 2 */}
-      <div className="flex items-center justify-between">
+      {/* Top Beige Navigation Banner matching Title Munke consistency: < Back */}
+      <div className="bg-[#ede4db] rounded-2xl px-5 py-3 flex items-center justify-between border border-[#e2d7cc] shadow-2xs">
         <button
           onClick={onBackToFinder}
-          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors cursor-pointer group"
+          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors cursor-pointer group"
         >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-          <span>Back to Finder</span>
+          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+          <span>Back</span>
         </button>
 
-        <span className="text-xs text-stone-400 font-mono">
+        <span className="text-xs text-stone-500 font-mono">
           BBL: {property.bbl}
         </span>
       </div>
