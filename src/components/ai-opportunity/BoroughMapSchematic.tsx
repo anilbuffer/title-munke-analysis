@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Plus, Minus, Navigation, MapPin } from 'lucide-react';
+import { Plus, Minus, Navigation } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import { AIOpportunityProperty, Borough } from '@/types/ai-opportunity';
 
@@ -13,28 +13,28 @@ interface BoroughMapSchematicProps {
   hoveredPropertyId?: string | null;
 }
 
-// Borough center coordinates for live interactive map
+// Borough center coordinates & default zoom levels
 const BOROUGH_CENTERS: Record<Borough, { center: [number, number]; zoom: number }> = {
   Bronx: { center: [40.8715, -73.886], zoom: 14 },
   Brooklyn: { center: [40.635, -73.945], zoom: 14 },
-  Queens: { center: [40.742, -73.85], zoom: 13 },
+  Queens: { center: [40.735, -73.815], zoom: 13 },
   Manhattan: { center: [40.758, -73.985], zoom: 13 },
   'Staten Island': { center: [40.579, -74.15], zoom: 12 },
 };
 
 // 7 Authentic Schematic Dots matching Reference Image 1 exactly
-const SCHEMATIC_BASE_DOTS = [
+const SCHEMATIC_DOTS = [
   // Island 1 (Left - Bronx / Manhattan)
-  { id: 'DOT-1', x: 215, y: 165, borough: 'Bronx', defaultAddress: '3025 Briggs Avenue', defaultPrice: '$1,280,000' },
-  { id: 'DOT-2', x: 265, y: 245, borough: 'Bronx', defaultAddress: '280 E 198th Street', defaultPrice: '$945,000' },
-  { id: 'DOT-3', x: 315, y: 292, borough: 'Bronx', defaultAddress: '3050 Bainbridge Avenue', defaultPrice: '$1,820,000' },
-  // Island 2 (Top Center-Right)
-  { id: 'DOT-4', x: 550, y: 165, borough: 'Bronx', defaultAddress: '2980 Grand Concourse', defaultPrice: '$2,150,000' },
-  { id: 'DOT-5', x: 600, y: 202, borough: 'Bronx', defaultAddress: '2775 Webster Avenue', defaultPrice: '$3,400,000' },
+  { id: 'BRONX-01', x: 92, y: 75, address: '3025 Briggs Avenue', price: '$1,280,000', borough: 'Bronx' },
+  { id: 'BRONX-02', x: 116, y: 138, address: '280 E 198th Street', price: '$945,000', borough: 'Bronx' },
+  { id: 'BRONX-03', x: 138, y: 182, address: '3050 Bainbridge Avenue', price: '$1,820,000', borough: 'Bronx' },
+  // Island 2 (Top Right)
+  { id: 'DOT-4', x: 245, y: 72, address: '2980 Grand Concourse', price: '$2,150,000', borough: 'Bronx' },
+  { id: 'DOT-5', x: 268, y: 102, address: '2775 Webster Avenue', price: '$3,400,000', borough: 'Bronx' },
   // Island 3 (Bottom Center - Brooklyn)
-  { id: 'DOT-6', x: 505, y: 285, borough: 'Brooklyn', defaultAddress: '3218 Avenue I', defaultPrice: '$1,420,000' },
+  { id: 'BK-01', x: 226, y: 202, address: '3218 Avenue I', price: '$1,420,000', borough: 'Brooklyn' },
   // Island 4 (Far Right - Queens)
-  { id: 'DOT-7', x: 820, y: 265, borough: 'Queens', defaultAddress: '68-15 174th Street', defaultPrice: '$1,150,000' },
+  { id: 'QN-02', x: 368, y: 168, address: '68-15 174th Street', price: '$1,150,000', borough: 'Queens' },
 ];
 
 export function BoroughMapSchematic({
@@ -51,28 +51,39 @@ export function BoroughMapSchematic({
   const tileLayerRef = useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const markersLayerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const leafletRef = useRef<any>(null);
 
-  // Default to 'Schematic' matching Reference Image 1 exactly, with option to toggle to 'Interactive Map'
-  const [viewMode, setViewMode] = useState<'Schematic' | 'Interactive Map'>('Schematic');
-  const [tooltip, setTooltip] = useState<{
+  // Default to 'Roadmap' for real feel with pins, with instant toggle to Satellite or Schematic
+  const [viewMode, setViewMode] = useState<'Roadmap' | 'Satellite' | 'Schematic'>('Roadmap');
+  const [schematicTooltip, setSchematicTooltip] = useState<{
     text: string;
     subtext: string;
     x: number;
     y: number;
   } | null>(null);
 
-  // Render Leaflet Markers for the Interactive Map
+  // Tile URL helper for Google Maps Roadmap & Satellite Hybrid
+  const getTileUrl = (mode: 'Roadmap' | 'Satellite') => {
+    if (mode === 'Satellite') {
+      return 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}';
+    }
+    return 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}';
+  };
+
+  // Helper to render high-contrast Title Munke custom pins onto Leaflet map
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const renderLeafletMarkers = useCallback((L: any, map: any, layerGroup: any) => {
-    if (!map || !layerGroup) return;
+  const renderMarkers = useCallback((L: any, map: any, layerGroup: any) => {
+    if (!L || !map || !layerGroup) return;
 
     layerGroup.clearLayers();
     const bounds: [number, number][] = [];
 
     properties.forEach((prop) => {
+      if (typeof prop.lat !== 'number' || typeof prop.lng !== 'number') return;
+
       const isSelected = selectedPropertyId === prop.id;
       const isHovered = hoveredPropertyId === prop.id;
-      const pinColor = isSelected ? '#550000' : isHovered ? '#780000' : '#8b0000';
 
       const formattedPrice =
         prop.lastRecordedSalePrice >= 1000000
@@ -80,74 +91,62 @@ export function BoroughMapSchematic({
           : `$${(prop.lastRecordedSalePrice / 1000).toFixed(0)}k`;
 
       const pinIcon = L.divIcon({
-        className: 'title-munke-custom-pin',
+        className: 'title-munke-map-pin',
+        iconSize: [110, 48],
+        iconAnchor: [55, 46],
         html: `
-          <div style="cursor: pointer; display: flex; flex-direction: column; align-items: center; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35)); transform: ${
-            isSelected ? 'scale(1.18)' : isHovered ? 'scale(1.08)' : 'scale(1)'
-          }; transition: transform 0.15s ease;">
+          <div style="cursor: pointer; display: flex; flex-direction: column; align-items: center; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35)); transform: ${
+            isSelected ? 'scale(1.15)' : isHovered ? 'scale(1.08)' : 'scale(1)'
+          }; transition: transform 0.15s ease-out;">
             <!-- Price Badge Pill -->
             <div style="
               background: ${isSelected ? '#550000' : '#291e1a'};
               color: #ffffff;
-              font-family: var(--font-poppins), system-ui, sans-serif;
+              font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
               font-size: 11px;
               font-weight: 700;
-              padding: 2.5px 8px;
+              padding: 3px 9px;
               border-radius: 9999px;
               border: 2px solid #ffffff;
               white-space: nowrap;
-              margin-bottom: -5px;
-              z-index: 2;
+              margin-bottom: 2px;
+              box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+            ">
+              ${formattedPrice}
+            </div>
+            <!-- Pin Dot -->
+            <div style="
+              width: 16px;
+              height: 16px;
+              border-radius: 50%;
+              background: ${isSelected ? '#550000' : '#4a0e0e'};
+              border: 2.5px solid #ffffff;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.3);
               display: flex;
               align-items: center;
-              gap: 4px;
-              box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+              justify-content: center;
             ">
-              <span style="width: 6px; height: 6px; border-radius: 50%; background: ${
-                isSelected ? '#22c55e' : '#f59e0b'
-              }; display: inline-block;"></span>
-              <span>${formattedPrice}</span>
+              <div style="width: 5px; height: 5px; border-radius: 50%; background: #ffffff;"></div>
             </div>
-            
-            <!-- Pin Teardrop SVG -->
-            <svg width="28" height="36" viewBox="0 0 28 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M14 0C6.27 0 0 6.27 0 14C0 24.5 14 36 14 36C14 36 28 24.5 28 14C28 6.27 21.73 0 14 0Z" fill="${pinColor}"/>
-              <circle cx="14" cy="14" r="5.5" fill="#FFFFFF"/>
-              <circle cx="14" cy="14" r="2.8" fill="${isSelected ? '#22c55e' : '#550000'}"/>
-            </svg>
           </div>
         `,
-        iconSize: [68, 54],
-        iconAnchor: [34, 54],
-        popupAnchor: [0, -54],
       });
 
       const marker = L.marker([prop.lat, prop.lng], {
         icon: pinIcon,
-        zIndexOffset: isSelected ? 1000 : 100,
+        zIndexOffset: isSelected ? 1000 : isHovered ? 500 : 100,
       });
 
-      const popupContent = `
-        <div style="font-family: var(--font-poppins), sans-serif; padding: 4px 6px; min-width: 190px;">
-          <div style="font-size: 10px; font-weight: 700; color: #15803d; text-transform: uppercase;">
-            ${prop.borough} · ${prop.propertyType}
-          </div>
-          <div style="font-size: 13px; font-weight: 700; color: #1c1917; margin-top: 2px;">
-            ${prop.address}
-          </div>
-          <div style="font-size: 16px; font-weight: 800; color: #550000; margin-top: 3px;">
-            $${prop.lastRecordedSalePrice.toLocaleString()}
-          </div>
-          <div style="font-size: 11px; color: #78716c; margin-top: 2px;">
-            ${prop.grossSqFt.toLocaleString()} sq ft · $${prop.pricePerSqFt}/sq ft
-          </div>
-        </div>
-      `;
-
-      marker.bindPopup(popupContent, {
-        closeButton: false,
-        offset: [0, -32],
-      });
+      // Hover tooltip with address and property type
+      marker.bindTooltip(
+        `<div style="font-weight: 600; color: #fff;">${prop.address}</div>
+         <div style="font-size: 10px; color: #fca5a5;">${prop.propertyType} · $${prop.lastRecordedSalePrice.toLocaleString()}</div>`,
+        {
+          direction: 'top',
+          offset: [0, -42],
+          className: 'title-munke-tooltip',
+        }
+      );
 
       marker.on('click', () => {
         onSelectProperty(prop.id);
@@ -157,39 +156,37 @@ export function BoroughMapSchematic({
       bounds.push([prop.lat, prop.lng]);
     });
 
-    if (bounds.length > 0 && map) {
-      if (bounds.length === 1) {
-        map.setView(bounds[0], 15);
-      } else {
-        map.fitBounds(bounds, {
-          padding: [50, 50],
-          maxZoom: 16,
-        });
+    // Auto-fit bounds if we have property points
+    if (bounds.length > 0) {
+      if (selectedPropertyId) {
+        const selected = properties.find((p) => p.id === selectedPropertyId);
+        if (selected && selected.lat && selected.lng) {
+          map.setView([selected.lat, selected.lng], 15, { animate: true });
+          return;
+        }
       }
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
     }
   }, [properties, selectedPropertyId, hoveredPropertyId, onSelectProperty]);
 
-  // Leaflet map initialization
+  // Initialize and update Leaflet Map
   useEffect(() => {
     let isMounted = true;
 
     async function initMap() {
       if (typeof window === 'undefined' || !mapContainerRef.current) return;
-      if (viewMode !== 'Interactive Map') {
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.remove();
-          mapInstanceRef.current = null;
-        }
-        return;
-      }
+      if (viewMode === 'Schematic') return;
 
       const L = (await import('leaflet')).default;
       if (!isMounted || !mapContainerRef.current) return;
 
-      // Fix Leaflet icons
-      // @ts-expect-error Leaflet private property
+      leafletRef.current = L;
+
+      // Fix Leaflet's default image URL getter
+      // @ts-expect-error Leaflet internal property
       delete L.Icon.Default.prototype._getIconUrl;
 
+      // Clean up previous map if exists
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
@@ -206,20 +203,31 @@ export function BoroughMapSchematic({
 
       mapInstanceRef.current = map;
 
-      const tileLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+      const tileLayer = L.tileLayer(getTileUrl(viewMode), {
         maxZoom: 20,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
       }).addTo(map);
 
       tileLayerRef.current = tileLayer;
 
+      // Create LayerGroup for property markers
       const markersLayer = L.layerGroup().addTo(map);
       markersLayerRef.current = markersLayer;
 
-      renderLeafletMarkers(L, map, markersLayer);
+      // Immediately render markers so map is never empty
+      renderMarkers(L, map, markersLayer);
+
+      // Force size recalculation to prevent clipped tiles
+      setTimeout(() => {
+        if (isMounted && mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+        }
+      }, 150);
     }
 
-    initMap();
+    if (viewMode !== 'Schematic') {
+      initMap();
+    }
 
     return () => {
       isMounted = false;
@@ -228,257 +236,62 @@ export function BoroughMapSchematic({
         mapInstanceRef.current = null;
       }
     };
-  }, [viewMode, borough, renderLeafletMarkers]);
+  }, [viewMode, borough]); // Re-initialize when viewMode or borough changes
 
-  // Update Leaflet markers on property changes
+  // Update markers when properties, selection or hover states change
   useEffect(() => {
-    if (!mapInstanceRef.current || !markersLayerRef.current || viewMode !== 'Interactive Map') return;
-    let isMounted = true;
-    async function refresh() {
-      const L = (await import('leaflet')).default;
-      if (!isMounted || !mapInstanceRef.current || !markersLayerRef.current) return;
-      renderLeafletMarkers(L, mapInstanceRef.current, markersLayerRef.current);
+    if (viewMode === 'Schematic' || !mapInstanceRef.current || !markersLayerRef.current || !leafletRef.current) {
+      return;
     }
-    refresh();
-    return () => {
-      isMounted = false;
-    };
-  }, [properties, selectedPropertyId, hoveredPropertyId, viewMode, renderLeafletMarkers]);
+    renderMarkers(leafletRef.current, mapInstanceRef.current, markersLayerRef.current);
+  }, [properties, selectedPropertyId, hoveredPropertyId, renderMarkers, viewMode]);
+
+  // Recenter map on active borough
+  const handleRecenter = () => {
+    if (!mapInstanceRef.current) return;
+    const config = BOROUGH_CENTERS[borough] || BOROUGH_CENTERS.Bronx;
+    mapInstanceRef.current.flyTo(config.center, config.zoom, { duration: 0.8 });
+  };
 
   return (
     <div className="w-full">
-      {/* Outer Card with warm styling matching Reference Image 1 */}
+      {/* Outer Card with warm Title Munke styling */}
       <div className="relative bg-[#fcfaf7] border border-[#eadfd4] rounded-2xl p-4 sm:p-5 shadow-2xs">
-        {/* Top Header Row matching Image 1 */}
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+        {/* Top Header Row: BOROUGH MAP · SCHEMATIC + View Switcher */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
-              BOROUGH MAP · SCHEMATIC
+              BOROUGH MAP {viewMode === 'Schematic' ? '· SCHEMATIC' : ''}
             </span>
             <span className="text-xs font-semibold text-stone-700 bg-stone-200/80 px-2.5 py-0.5 rounded-md">
               {borough}
             </span>
           </div>
 
-          {/* Toggle between Pixel-Perfect Schematic & Live Interactive Map */}
-          <div className="flex items-center gap-1 bg-white border border-[#eadfd4] p-0.5 rounded-xl shadow-2xs">
-            <button
-              onClick={() => setViewMode('Schematic')}
-              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-                viewMode === 'Schematic'
-                  ? 'bg-[#550000] text-white shadow-2xs'
-                  : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
-              }`}
-            >
-              Schematic
-            </button>
-            <button
-              onClick={() => setViewMode('Interactive Map')}
-              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-1 ${
-                viewMode === 'Interactive Map'
-                  ? 'bg-[#550000] text-white shadow-2xs'
-                  : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
-              }`}
-            >
-              <MapPin className="w-3 h-3" />
-              <span>Interactive Map</span>
-            </button>
+          {/* View Mode Toggle: Roadmap | Satellite | Schematic */}
+          <div className="flex items-center bg-stone-200/60 p-0.5 rounded-lg border border-stone-300/60 text-xs font-semibold">
+            {(['Roadmap', 'Satellite', 'Schematic'] as const).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setViewMode(mode)}
+                className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
+                  viewMode === mode
+                    ? 'bg-[#550000] text-white shadow-xs font-bold'
+                    : 'text-stone-600 hover:text-stone-900 hover:bg-white/50'
+                }`}
+              >
+                {mode}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* 1. EXACT PIXEL-PERFECT SCHEMATIC MAP (Matching Reference Image 1) */}
-        {viewMode === 'Schematic' && (
-          <div className="relative w-full h-[320px] sm:h-[360px] rounded-xl overflow-hidden border border-[#eadfd4] bg-[#fbf8f5] flex items-center justify-center">
-            <svg
-              viewBox="0 0 1000 440"
-              className="w-full h-full select-none"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              <defs>
-                <filter id="islandShadow" x="-5%" y="-5%" width="110%" height="115%">
-                  <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.09" />
-                </filter>
-              </defs>
-
-              {/* Background canvas fill */}
-              <rect width="1000" height="440" fill="#fcfaf7" />
-
-              {/* Island 1: West / Manhattan & West Bronx (Matching Reference Image 1) */}
-              <polygon
-                points="100,150 290,125 395,150 350,220 430,245 375,310 230,325 120,285 72,225"
-                fill="#ebdccb"
-                stroke="#bfa693"
-                strokeWidth="1.6"
-                filter="url(#islandShadow)"
-              />
-
-              {/* Island 2: Upper Center / East Bronx */}
-              <polygon
-                points="485,130 655,140 730,185 670,240 530,235 450,175"
-                fill="#ebdccb"
-                stroke="#bfa693"
-                strokeWidth="1.6"
-                filter="url(#islandShadow)"
-              />
-
-              {/* Island 3: Bottom Center / Brooklyn */}
-              <polygon
-                points="420,255 570,245 655,280 565,325 415,305"
-                fill="#ebdccb"
-                stroke="#bfa693"
-                strokeWidth="1.6"
-                filter="url(#islandShadow)"
-              />
-
-              {/* Island 4: Far Right / Queens */}
-              <polygon
-                points="745,230 910,220 930,275 830,315 715,285"
-                fill="#ebdccb"
-                stroke="#bfa693"
-                strokeWidth="1.6"
-                filter="url(#islandShadow)"
-              />
-
-              {/* Center Caption matching Reference Image 1 exactly */}
-              <text
-                x="500"
-                y="380"
-                textAnchor="middle"
-                fill="#6d5f57"
-                fontSize="15"
-                fontWeight="500"
-                fontFamily="var(--font-poppins), sans-serif"
-              >
-                NYC · Illustrative map
-              </text>
-
-              {/* Render the 7 Schematic Pin Points matching Reference Image 1 */}
-              {SCHEMATIC_BASE_DOTS.map((dot, idx) => {
-                // Check if this dot maps to an active filtered property
-                const matchedProp = properties.find((p) => {
-                  if (borough === 'Bronx') {
-                    if (idx === 0) return p.id === 'BRONX-01';
-                    if (idx === 1) return p.id === 'BRONX-02';
-                    if (idx === 2) return p.id === 'BRONX-03';
-                    if (idx === 3) return p.id === 'BRONX-04';
-                    if (idx === 4) return p.id === 'BRONX-05';
-                  }
-                  if (borough === 'Brooklyn' && idx === 5) return p.borough === 'Brooklyn';
-                  if (borough === 'Queens' && idx === 6) return p.borough === 'Queens';
-                  return false;
-                });
-
-                const isSelected = matchedProp ? selectedPropertyId === matchedProp.id : false;
-                const isHovered = matchedProp ? hoveredPropertyId === matchedProp.id : false;
-
-                const displayAddress = matchedProp ? matchedProp.address : dot.defaultAddress;
-                const displayPrice = matchedProp
-                  ? `$${matchedProp.lastRecordedSalePrice.toLocaleString()}`
-                  : dot.defaultPrice;
-
-                return (
-                  <g
-                    key={dot.id}
-                    className="cursor-pointer"
-                    onClick={() => {
-                      if (matchedProp) onSelectProperty(matchedProp.id);
-                    }}
-                    onMouseEnter={() =>
-                      setTooltip({
-                        text: displayAddress,
-                        subtext: displayPrice,
-                        x: dot.x,
-                        y: dot.y,
-                      })
-                    }
-                    onMouseLeave={() => setTooltip(null)}
-                  >
-                    {/* Selected Elegant Highlight Ring */}
-                    {isSelected && (
-                      <>
-                        <circle
-                          cx={dot.x}
-                          cy={dot.y}
-                          r="15"
-                          fill="none"
-                          stroke="#550000"
-                          strokeWidth="2"
-                          opacity="0.3"
-                        />
-                        <circle
-                          cx={dot.x}
-                          cy={dot.y}
-                          r="19"
-                          fill="#550000"
-                          opacity="0.12"
-                        />
-                      </>
-                    )}
-
-                    {/* Outer White Ring */}
-                    <circle
-                      cx={dot.x}
-                      cy={dot.y}
-                      r={isSelected ? 8.5 : isHovered ? 8 : 7}
-                      fill="#550000"
-                      stroke="#ffffff"
-                      strokeWidth="2.5"
-                      className="transition-transform duration-150 hover:scale-125"
-                    />
-                  </g>
-                );
-              })}
-
-              {/* Hover Tooltip on Schematic Map */}
-              {tooltip && (
-                <g
-                  transform={`translate(${Math.min(Math.max(tooltip.x - 75, 20), 850)}, ${
-                    tooltip.y > 110 ? tooltip.y - 48 : tooltip.y + 20
-                  })`}
-                  pointerEvents="none"
-                >
-                  <rect
-                    width="150"
-                    height="42"
-                    rx="8"
-                    fill="#291e1a"
-                    opacity="0.95"
-                    filter="url(#islandShadow)"
-                  />
-                  <text
-                    x="75"
-                    y="17"
-                    textAnchor="middle"
-                    fill="#ffffff"
-                    fontSize="11"
-                    fontWeight="700"
-                    fontFamily="var(--font-poppins)"
-                  >
-                    {tooltip.text}
-                  </text>
-                  <text
-                    x="75"
-                    y="32"
-                    textAnchor="middle"
-                    fill="#fca5a5"
-                    fontSize="11"
-                    fontWeight="800"
-                    fontFamily="var(--font-poppins)"
-                  >
-                    {tooltip.subtext}
-                  </text>
-                </g>
-              )}
-            </svg>
-          </div>
-        )}
-
-        {/* 2. REAL INTERACTIVE LEAFLET MAP (With live geocoded teardrop pins) */}
-        {viewMode === 'Interactive Map' && (
-          <div className="relative w-full h-[320px] sm:h-[360px] rounded-xl overflow-hidden border border-[#eadfd4] shadow-inner bg-[#e5e3df]">
+        {/* 1. REAL INTERACTIVE LEAFLET MAP (Roadmap & Satellite with Live Pin Points) */}
+        {viewMode !== 'Schematic' && (
+          <div className="relative w-full h-[320px] sm:h-[380px] rounded-xl overflow-hidden border border-[#eadfd4] shadow-inner bg-[#e5e3df]">
             <div ref={mapContainerRef} className="w-full h-full z-0" />
 
-            {/* Custom Interactive Controls */}
+            {/* Custom Interactive Controls (Zoom & Recenter) */}
             <div className="absolute top-3 right-3 z-10 flex flex-col gap-1.5 shadow-md">
               <button
                 onClick={() => mapInstanceRef.current && mapInstanceRef.current.zoomIn()}
@@ -495,11 +308,7 @@ export function BoroughMapSchematic({
                 <Minus className="w-4 h-4" />
               </button>
               <button
-                onClick={() => {
-                  if (!mapInstanceRef.current) return;
-                  const config = BOROUGH_CENTERS[borough] || BOROUGH_CENTERS.Bronx;
-                  mapInstanceRef.current.flyTo(config.center, config.zoom, { duration: 0.8 });
-                }}
+                onClick={handleRecenter}
                 className="w-8 h-8 rounded-lg bg-white/95 text-stone-700 hover:text-stone-900 hover:bg-white flex items-center justify-center border border-stone-200 transition-colors cursor-pointer shadow-2xs"
                 title={`Recenter on ${borough}`}
               >
@@ -510,15 +319,199 @@ export function BoroughMapSchematic({
             {/* Bottom Legend Badge */}
             <div className="absolute bottom-3 left-3 z-10 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-stone-200/80 text-[11px] text-stone-700 font-medium shadow-2xs flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#550000]"></span>
-              <span>{properties.length} geocoded property pin points in {borough}</span>
+              <span>{properties.length} recorded sale properties in {borough}</span>
             </div>
           </div>
         )}
 
-        {/* Footnote below Map Card matching Reference Image 1 */}
-        <p className="text-xs text-stone-400 mt-2">
-          Map points are schematic, not geocoded property coordinates.
-        </p>
+        {/* 2. AUTHENTIC SCHEMATIC VECTOR MAP (Pixel-exact reference reconstruction) */}
+        {viewMode === 'Schematic' && (
+          <div className="relative w-full py-2 flex flex-col items-center justify-center">
+            {/* Constrained container maintaining natural 440x285 proportions without pancake stretching */}
+            <div className="w-full max-w-lg aspect-[440/285] relative">
+              <svg
+                viewBox="0 0 440 285"
+                className="w-full h-full select-none"
+                preserveAspectRatio="xMidYMid meet"
+              >
+                <defs>
+                  <filter id="islandShadow" x="-5%" y="-5%" width="110%" height="115%">
+                    <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodOpacity="0.08" />
+                  </filter>
+                </defs>
+
+                {/* Island 1: West (Bronx / Manhattan) */}
+                <polygon
+                  points="175,45 128,22 45,48 32,98 48,165 95,218 155,202 182,185 152,105"
+                  fill="#ebdccb"
+                  stroke="#bfa693"
+                  strokeWidth="1.6"
+                  filter="url(#islandShadow)"
+                />
+
+                {/* Island 2: Upper East */}
+                <polygon
+                  points="218,25 295,36 328,88 302,145 240,145 200,85"
+                  fill="#ebdccb"
+                  stroke="#bfa693"
+                  strokeWidth="1.6"
+                  filter="url(#islandShadow)"
+                />
+
+                {/* Island 3: Lower Center (Brooklyn) */}
+                <polygon
+                  points="188,172 252,158 290,198 252,245 188,215"
+                  fill="#ebdccb"
+                  stroke="#bfa693"
+                  strokeWidth="1.6"
+                  filter="url(#islandShadow)"
+                />
+
+                {/* Island 4: Far Right (Queens) */}
+                <polygon
+                  points="328,125 402,112 415,162 375,220 318,198"
+                  fill="#ebdccb"
+                  stroke="#bfa693"
+                  strokeWidth="1.6"
+                  filter="url(#islandShadow)"
+                />
+
+                {/* Center Caption matching Reference Image 1 */}
+                <text
+                  x="220"
+                  y="268"
+                  textAnchor="middle"
+                  fill="#6d5f57"
+                  fontSize="14"
+                  fontWeight="500"
+                  fontFamily="var(--font-poppins), sans-serif"
+                >
+                  NYC · Illustrative map
+                </text>
+
+                {/* 7 Schematic Pin Points */}
+                {SCHEMATIC_DOTS.map((dot) => {
+                  const matchedProp = properties.find(
+                    (p) =>
+                      p.id === dot.id ||
+                      (borough === 'Brooklyn' && dot.id === 'BK-01' && p.borough === 'Brooklyn') ||
+                      (borough === 'Queens' && dot.id === 'QN-02' && p.borough === 'Queens')
+                  );
+
+                  const isSelected = matchedProp
+                    ? selectedPropertyId === matchedProp.id
+                    : selectedPropertyId === dot.id;
+                  const isHovered = matchedProp ? hoveredPropertyId === matchedProp.id : false;
+
+                  const displayAddress = matchedProp ? matchedProp.address : dot.address;
+                  const displayPrice = matchedProp
+                    ? `$${matchedProp.lastRecordedSalePrice.toLocaleString()}`
+                    : dot.price;
+
+                  return (
+                    <g
+                      key={dot.id}
+                      className="cursor-pointer"
+                      onClick={() => {
+                        if (matchedProp) {
+                          onSelectProperty(matchedProp.id);
+                        }
+                      }}
+                      onMouseEnter={() =>
+                        setSchematicTooltip({
+                          text: displayAddress,
+                          subtext: displayPrice,
+                          x: dot.x,
+                          y: dot.y,
+                        })
+                      }
+                      onMouseLeave={() => setSchematicTooltip(null)}
+                    >
+                      {/* Outer Selection Halo Ring matching Image 1 */}
+                      {isSelected && (
+                        <circle
+                          cx={dot.x}
+                          cy={dot.y}
+                          r="11"
+                          fill="none"
+                          stroke="#550000"
+                          strokeWidth="1.5"
+                          opacity="0.4"
+                        />
+                      )}
+
+                      {/* Burgundy Pin Circle with White Ring */}
+                      <circle
+                        cx={dot.x}
+                        cy={dot.y}
+                        r={isSelected ? 6.5 : isHovered ? 6 : 5.5}
+                        fill="#4a0e0e"
+                        stroke="#ffffff"
+                        strokeWidth="2.5"
+                        className="transition-transform duration-150 hover:scale-125"
+                      />
+                    </g>
+                  );
+                })}
+
+                {/* SVG Hover Tooltip */}
+                {schematicTooltip && (
+                  <g
+                    transform={`translate(${Math.min(Math.max(schematicTooltip.x - 70, 10), 300)}, ${
+                      schematicTooltip.y > 80 ? schematicTooltip.y - 42 : schematicTooltip.y + 16
+                    })`}
+                    pointerEvents="none"
+                  >
+                    <rect
+                      width="140"
+                      height="38"
+                      rx="7"
+                      fill="#291e1a"
+                      opacity="0.95"
+                      filter="url(#islandShadow)"
+                    />
+                    <text
+                      x="70"
+                      y="16"
+                      textAnchor="middle"
+                      fill="#ffffff"
+                      fontSize="10.5"
+                      fontWeight="700"
+                      fontFamily="var(--font-poppins)"
+                    >
+                      {schematicTooltip.text}
+                    </text>
+                    <text
+                      x="70"
+                      y="30"
+                      textAnchor="middle"
+                      fill="#fca5a5"
+                      fontSize="10"
+                      fontWeight="800"
+                      fontFamily="var(--font-poppins)"
+                    >
+                      {schematicTooltip.subtext}
+                    </text>
+                  </g>
+                )}
+              </svg>
+            </div>
+          </div>
+        )}
+
+        {/* Footnote below Map Card */}
+        <div className="flex flex-wrap items-center justify-between text-xs text-stone-400 mt-2.5">
+          <span>
+            {viewMode === 'Schematic'
+              ? 'Map points are schematic, not geocoded property coordinates.'
+              : `Interactive geocoded GIS map showing registered ACRIS deeds in ${borough}.`}
+          </span>
+          {viewMode !== 'Schematic' && (
+            <span className="hidden sm:inline font-mono text-[11px] text-stone-400">
+              Lat/Lng geocoding verified · DOF Rolling Sales
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -82,3 +82,24 @@ nextjs-portal,
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+/* Leaflet custom map markers and tooltips */
+.title-munke-map-pin {
+  background: transparent !important;
+  border: none !important;
+}
+
+.title-munke-tooltip {
+  background: #291e1a !important;
+  color: #ffffff !important;
+  border: 1px solid #550000 !important;
+  border-radius: 8px !important;
+  padding: 4px 8px !important;
+  font-family: var(--font-poppins), sans-serif !important;
+  font-size: 11px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+}
+
+.title-munke-tooltip::before {
+  border-top-color: #291e1a !important;
+}
