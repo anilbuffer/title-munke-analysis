@@ -70,3 +70,15 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Hide Next.js dev indicators and overlays */
+nextjs-portal,
+[data-nextjs-dev-tools],
+[data-next-badge],
+#nextjs-dev-indicator,
+.__next-dev-tools-indicator {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
