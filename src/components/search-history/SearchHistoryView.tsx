@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   Bot,
   Sparkles,
+  Briefcase,
 } from 'lucide-react';
 import {
   PENNSYLVANIA_SEARCH_HISTORY,
@@ -86,7 +87,7 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
   };
 
   const handleDownload = (record: SearchHistoryItem) => {
-    setToastMessage(`Downloading Title Abstract for ${record.address}...`);
+    setToastMessage(`Generating Broker Title Closing Package for ${record.address}...`);
     setTimeout(() => {
       setToastMessage(null);
     }, 3500);
@@ -156,17 +157,53 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
         </div>
       )}
 
+      {/* Broker Portal Header Bar */}
+      <div className="bg-[#ede4db] rounded-2xl p-4 sm:p-5 mb-5 border border-[#e2d7cc] shadow-2xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-[#550000] text-white flex items-center justify-center shrink-0 shadow-xs">
+              <Briefcase className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-sm sm:text-base font-bold text-[#3d2014]">
+                  Broker Search History & Closing Pipeline
+                </h1>
+                <span className="text-[10px] font-semibold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">
+                  Verified
+                </span>
+              </div>
+              <p className="text-xs text-stone-600 mt-0.5">
+                Brokerage title abstract records, deed chains, lien verification & AI property valuation models.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-start md:self-auto">
+            <button
+              onClick={() => {
+                setToastMessage(`Exporting ${activeTab} Broker Portfolio Package (CSV)...`);
+                setTimeout(() => setToastMessage(null), 3000);
+              }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#eadfd4] bg-white text-stone-800 hover:bg-stone-50 text-xs font-medium shadow-2xs cursor-pointer transition-colors"
+            >
+              <Download className="w-3.5 h-3.5 text-stone-600" />
+              <span>Export Portfolio</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Tabs Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-2">
           {/* Pennsylvania Tab */}
           <button
             onClick={() => setActiveTab('Pennsylvania')}
-            className={`px-6 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer ${
-              activeTab === 'Pennsylvania'
+            className={`px-6 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer ${activeTab === 'Pennsylvania'
                 ? 'bg-[#550000] text-white shadow-xs shadow-[#550000]/20'
                 : 'text-stone-700 hover:text-stone-900 hover:bg-white/60'
-            }`}
+              }`}
           >
             Pennsylvania
           </button>
@@ -174,11 +211,10 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
           {/* New York Tab */}
           <button
             onClick={() => setActiveTab('New York')}
-            className={`px-6 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer ${
-              activeTab === 'New York'
+            className={`px-6 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer ${activeTab === 'New York'
                 ? 'bg-[#550000] text-white shadow-xs shadow-[#550000]/20'
                 : 'text-stone-700 hover:text-stone-900 hover:bg-white/60'
-            }`}
+              }`}
           >
             New York
           </button>

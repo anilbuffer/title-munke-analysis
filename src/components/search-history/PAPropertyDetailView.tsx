@@ -10,6 +10,7 @@ import {
   MapPin,
   Compass,
   ExternalLink,
+  Download,
 } from 'lucide-react';
 import {
   MOCK_PA_DOCUMENTS_EXACT,
@@ -85,13 +86,20 @@ export function PAPropertyDetailView({
 
       {/* Main White Card matching attached screenshot exactly */}
       <div className="bg-white rounded-3xl border border-[#eadfd4] p-6 sm:p-8 shadow-xs">
-        {/* Title Header with SUCCESS Badge */}
+        {/* Title Header with SUCCESS Badge & Broker Actions */}
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-[#f0e8e0] pb-5">
           <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-[10px] font-bold text-[#550000] uppercase tracking-wider bg-[#550000]/10 px-2.5 py-0.5 rounded-full border border-[#550000]/20">
+                Broker Closing Package
+              </span>
+              <span className="text-xs text-stone-400">•</span>
+              <span className="text-xs text-stone-500 font-medium">PIN: {property.pinParcel}</span>
+            </div>
             <h1 className="text-lg sm:text-xl font-bold text-[#3d2014] tracking-tight">
               {displayTitle}
             </h1>
-            <p className="text-xs text-[#8c7b75] mt-1.5 font-normal">
+            <p className="text-xs text-[#8c7b75] mt-1 font-normal">
               Searched on:{' '}
               <strong className="text-[#3d2014] font-semibold">
                 {property.searchedOn}
@@ -102,9 +110,22 @@ export function PAPropertyDetailView({
               </strong>
             </p>
           </div>
-          <span className="inline-flex items-center px-3 py-1 rounded text-xs font-semibold tracking-wide uppercase bg-[#eaf4ec] text-[#2d7a3e] border border-[#d3ebd7] self-start shrink-0">
-            {property.status}
-          </span>
+          <div className="flex items-center gap-2.5 self-start shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                setToastMessage(`Exporting Broker Closing Packet for ${displayAddress.split(',')[0]}...`);
+                setTimeout(() => setToastMessage(null), 3000);
+              }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#eadfd4] bg-white text-stone-800 hover:bg-stone-50 text-xs font-medium shadow-2xs cursor-pointer transition-colors"
+            >
+              <Download className="w-3.5 h-3.5 text-stone-600" />
+              <span className="hidden sm:inline">Export Closing Packet</span>
+            </button>
+            <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold tracking-wide uppercase bg-[#eaf4ec] text-[#2d7a3e] border border-[#d3ebd7]">
+              {property.status}
+            </span>
+          </div>
         </div>
 
         {/* Section: Description */}

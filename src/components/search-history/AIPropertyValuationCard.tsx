@@ -19,7 +19,7 @@ interface AIPropertyValuationCardProps {
 
 export function AIPropertyValuationCard({
   title = 'AI Property Valuation Engine',
-  description = 'Automated valuation model analyzing real-time deed recordings, tax assessment data, and market comparables.',
+  description = 'Automated valuation model analyzing real-time deed recordings, municipal tax assessments, and comparable sales for broker underwriting.',
   onOpenValuation,
 }: AIPropertyValuationCardProps) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
