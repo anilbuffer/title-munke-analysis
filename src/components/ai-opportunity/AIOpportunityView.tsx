@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Borough, AIOpportunityProperty } from '@/types/ai-opportunity';
 import { MOCK_AI_OPPORTUNITIES } from '@/data/mock-ai-opportunities';
 import { BoroughMapSchematic } from './BoroughMapSchematic';
@@ -39,6 +39,34 @@ export function AIOpportunityView({
     null
   );
 
+  // Check URL query param on mount (e.g. ?property=BRONX-01)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const checkUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const propParam = params.get('property') || params.get('id');
+      if (propParam) {
+        const found = MOCK_AI_OPPORTUNITIES.find(
+          (p) =>
+            p.id.toLowerCase() === propParam.toLowerCase() ||
+            p.address.toLowerCase().includes(propParam.toLowerCase().replace(/-/g, ' '))
+        );
+        if (found) {
+          setSelectedPropertyId(found.id);
+          setSelectedBorough(found.borough);
+          setActiveViewMode('detail');
+          return;
+        }
+      }
+      setActiveViewMode('finder');
+    };
+
+    checkUrl();
+    window.addEventListener('popstate', checkUrl);
+    return () => window.removeEventListener('popstate', checkUrl);
+  }, []);
+
   // Filter properties by Borough and Price range
   const filteredProperties = useMemo(() => {
     return MOCK_AI_OPPORTUNITIES.filter((prop) => {
@@ -66,11 +94,32 @@ export function AIOpportunityView({
     setMaxPrice(2000000);
     setSelectedPropertyId('BRONX-01');
     setActiveViewMode('finder');
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('property');
+      url.searchParams.delete('id');
+      window.history.pushState({}, '', url.pathname);
+    }
   };
 
   const handleSelectProperty = (property: AIOpportunityProperty) => {
     setSelectedPropertyId(property.id);
     setActiveViewMode('detail');
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('property', property.id);
+      window.history.pushState({ propertyId: property.id }, '', url.toString());
+    }
+  };
+
+  const handleBackToFinder = () => {
+    setActiveViewMode('finder');
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('property');
+      url.searchParams.delete('id');
+      window.history.pushState({}, '', url.pathname);
+    }
   };
 
   const handleSelectPropertyFromMap = (id: string) => {
@@ -111,7 +160,7 @@ export function AIOpportunityView({
     return (
       <PropertyDetailCard
         property={selectedProperty}
-        onBackToFinder={() => setActiveViewMode('finder')}
+        onBackToFinder={handleBackToFinder}
         onOpenValuation={(address) => setViewingValuationAddress(address)}
         onOpenNYPropertyDetail={(address) => setViewingNYDetailAddress(address)}
       />

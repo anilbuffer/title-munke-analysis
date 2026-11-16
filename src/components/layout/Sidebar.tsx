@@ -86,7 +86,9 @@ export function Sidebar({
           <nav className="space-y-1.5">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = activeNavItem === item.name;
+              const isActive =
+                activeNavItem === item.name ||
+                (item.name === 'AI Opportunity' && activeNavItem === 'Property Finder');
 
               return (
                 <button
