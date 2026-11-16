@@ -99,9 +99,6 @@ export function ComparableSalesTable({ record }: ComparableSalesTableProps) {
               Recent Comparable Sales
             </h2>
           </div>
-          <p className="text-[11px] text-stone-500 mt-0.5">
-            Ingested from NYC Rolling Sales & verified PLUTO records
-          </p>
         </div>
 
         {/* Quick Summary Pill & Filter */}
@@ -210,11 +207,10 @@ export function ComparableSalesTable({ record }: ComparableSalesTableProps) {
                     {/* Match Score */}
                     <td className="py-2.5 px-2.5 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold ${
-                          comp.similarityScore >= 95
+                        className={`inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold ${comp.similarityScore >= 95
                             ? 'bg-emerald-50 text-emerald-800'
                             : 'bg-stone-100 text-stone-700'
-                        }`}
+                          }`}
                       >
                         {comp.similarityScore}%
                       </span>

@@ -42,17 +42,13 @@ export function NeighborhoodComparisonCard({ record }: NeighborhoodComparisonCar
               Neighborhood Comparison & Valuation Insights
             </h2>
           </div>
-          <p className="text-[11px] text-stone-500 mt-0.5">
-            Benchmarked against {neighborhoodBenchmark.neighborhoodName} submarket transactions
-          </p>
         </div>
 
         <div
-          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold self-start sm:self-auto ${
-            isPremium
+          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold self-start sm:self-auto ${isPremium
               ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
               : 'bg-amber-50 text-amber-800 border border-amber-200'
-          }`}
+            }`}
         >
           {isPremium ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
           <span>
@@ -126,13 +122,12 @@ export function NeighborhoodComparisonCard({ record }: NeighborhoodComparisonCar
               className="bg-white rounded-lg p-2.5 border border-[#eadfd4] text-[11px] flex items-start gap-2"
             >
               <span
-                className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${
-                  driver.impact === 'INCREASES_VALUE'
+                className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${driver.impact === 'INCREASES_VALUE'
                     ? 'bg-emerald-500'
                     : driver.impact === 'DECREASES_VALUE'
-                    ? 'bg-red-500'
-                    : 'bg-stone-400'
-                }`}
+                      ? 'bg-red-500'
+                      : 'bg-stone-400'
+                  }`}
               />
               <div className="space-y-0.5">
                 <span className="font-bold text-stone-800">{driver.factor}</span>

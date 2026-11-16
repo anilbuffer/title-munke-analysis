@@ -143,16 +143,18 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
         </div>
       )}
 
-      {/* Top: Back Navigation Banner */}
-      <div className="bg-[#ede4db] rounded-2xl px-5 py-3 mb-5 flex items-center border border-[#e2d7cc] shadow-2xs">
-        <button
-          onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors cursor-pointer group"
-        >
-          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-          <span>Back</span>
-        </button>
-      </div>
+      {/* Top: Back Navigation Banner (Only rendered when onBack is explicitly passed) */}
+      {onBack && (
+        <div className="bg-[#ede4db] rounded-2xl px-5 py-3 mb-5 flex items-center border border-[#e2d7cc] shadow-2xs">
+          <button
+            onClick={onBack}
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors cursor-pointer group"
+          >
+            <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+            <span>Back</span>
+          </button>
+        </div>
+      )}
 
       {/* Tabs Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">

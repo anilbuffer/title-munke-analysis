@@ -37,8 +37,8 @@ export function PriceOutlookChart({ record }: PriceOutlookChartProps) {
     selectedHorizon === 1
       ? priceOutlookScenarios.oneYear
       : selectedHorizon === 3
-      ? priceOutlookScenarios.threeYear
-      : priceOutlookScenarios.fiveYear;
+        ? priceOutlookScenarios.threeYear
+        : priceOutlookScenarios.fiveYear;
 
   // Chart values
   const y0 = estimatedMarketValue;
@@ -127,9 +127,6 @@ export function PriceOutlookChart({ record }: PriceOutlookChartProps) {
               Price Outlook
             </h2>
           </div>
-          <p className="text-[11px] text-stone-500 mt-0.5">
-            NYC Annualized Sales: 1, 3 and 5-year scenarios (conservative, expected, optimistic)
-          </p>
         </div>
 
         {/* 1, 3, 5-Year Horizon Selector */}
@@ -138,11 +135,10 @@ export function PriceOutlookChart({ record }: PriceOutlookChartProps) {
             <button
               key={yr}
               onClick={() => setSelectedHorizon(yr as 1 | 3 | 5)}
-              className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
-                selectedHorizon === yr
+              className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${selectedHorizon === yr
                   ? 'bg-[#550000] text-white shadow-2xs'
                   : 'text-stone-600 hover:text-stone-900'
-              }`}
+                }`}
             >
               {yr}-Year
             </button>
@@ -257,11 +253,10 @@ export function PriceOutlookChart({ record }: PriceOutlookChartProps) {
                 return (
                   <div
                     key={`dot-e-${idx}`}
-                    className={`absolute rounded-full -translate-x-1/2 -translate-y-1/2 z-20 transition-all ${
-                      isTarget
+                    className={`absolute rounded-full -translate-x-1/2 -translate-y-1/2 z-20 transition-all ${isTarget
                         ? 'w-3 h-3 bg-[#550000] border-2 border-white ring-2 ring-[#550000]/40'
                         : 'w-2.5 h-2.5 bg-[#550000] border-2 border-white'
-                    }`}
+                      }`}
                     style={{ left: `${p.x}%`, top: `${p.y}%` }}
                   />
                 );
@@ -284,19 +279,18 @@ export function PriceOutlookChart({ record }: PriceOutlookChartProps) {
               return (
                 <div
                   key={item.year}
-                  className={`absolute text-[10px] transition-colors ${
-                    isSelected
+                  className={`absolute text-[10px] transition-colors ${isSelected
                       ? 'font-bold text-[#550000]'
                       : 'font-medium text-stone-400'
-                  }`}
+                    }`}
                   style={{
                     left: `${item.pct}%`,
                     transform:
                       idx === 0
                         ? 'translateX(0%)'
                         : idx === yearsList.length - 1
-                        ? 'translateX(-100%)'
-                        : 'translateX(-50%)',
+                          ? 'translateX(-100%)'
+                          : 'translateX(-50%)',
                   }}
                 >
                   {item.label}

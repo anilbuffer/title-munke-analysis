@@ -81,9 +81,6 @@ export function HistoricalValueChart({ record }: HistoricalValueChartProps) {
               Historical Value Changes Over Time
             </h2>
           </div>
-          <p className="text-[11px] text-stone-500 mt-0.5">
-            Recorded deed transfers and municipal tax assessment progression
-          </p>
         </div>
 
         {sufficientHistoricalData && (
@@ -179,8 +176,8 @@ export function HistoricalValueChart({ record }: HistoricalValueChartProps) {
                       idx === 0
                         ? 'translateX(0%)'
                         : idx === points.length - 1
-                        ? 'translateX(-100%)'
-                        : 'translateX(-50%)',
+                          ? 'translateX(-100%)'
+                          : 'translateX(-50%)',
                   }}
                 >
                   {p.year}

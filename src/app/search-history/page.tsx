@@ -10,13 +10,8 @@ export default function SearchHistoryPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const router = useRouter();
 
-  const handleNavSelect = (item: string) => {
-    if (item === 'Search History') return;
-    if (item === 'Settings') {
-      router.push('/');
-    } else {
-      router.push(`/?tab=${encodeURIComponent(item)}`);
-    }
+  const handleNavSelect = () => {
+    // Only Search History is enabled
   };
 
   return (
@@ -41,7 +36,7 @@ export default function SearchHistoryPage() {
 
         {/* Main Content Area */}
         <main className="flex-1 pb-8">
-          <SearchHistoryView onBack={() => router.push('/')} />
+          <SearchHistoryView />
         </main>
       </div>
     </div>

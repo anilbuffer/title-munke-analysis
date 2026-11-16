@@ -76,8 +76,12 @@ export default function AISettingsPage() {
       <Sidebar
         isMobileOpen={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
-        activeNavItem={activeNav}
-        onSelectNav={(item) => setActiveNav(item)}
+        activeNavItem="Search History"
+        onSelectNav={(item) => {
+          if (item === 'Search History') {
+            setActiveNav('Search History');
+          }
+        }}
       />
 
       {/* Main Workspace (Offset for fixed lg sidebar w-72 (288px) + ml-4 (16px) = 304px) */}
@@ -86,25 +90,19 @@ export default function AISettingsPage() {
         {/* Top Header Card */}
         <div className="mb-5">
           <Header
-            activeNav={activeNav}
+            activeNav="Search History"
             onToggleSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
           />
         </div>
 
-        {/* Main Content Area */}
+        {/* Main Content Area: Exclusively Search History and its full interactive flow */}
         <main className="flex-1 pb-8">
-
-          {/* 1. SEARCH HISTORY VIEW (Matches User Attached Screenshots) */}
+          {/* Active Flow: Search History */}
           {activeNav === 'Search History' && (
-            <SearchHistoryView onBack={() => setActiveNav('Dashboard')} />
+            <SearchHistoryView />
           )}
 
-          {/* AI PROPERTY VALUATION ENGINE (FULL PAGE) */}
-          {activeNav === 'AI Valuation' && (
-            <AIPropertyValuationView onBack={() => setActiveNav('Search History')} />
-          )}
-
-          {/* 2. SETTINGS VIEW */}
+          {/* Other pages are disabled and inaccessible */}
           {activeNav === 'Settings' && (
             <div className="bg-[#f8f3ed] border border-[#eadfd4] rounded-3xl p-5 sm:p-6 lg:p-7 shadow-xs">
               {/* Sub-Tabs under Settings */}

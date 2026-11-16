@@ -29,13 +29,13 @@ export function Sidebar({
   onSelectNav,
 }: SidebarProps) {
   const navItems = [
-    { name: 'Dashboard', icon: LayoutGrid },
-    { name: 'Request', icon: UserSearch },
-    { name: 'Advanced Search', icon: Search },
-    { name: 'Search History', icon: History },
-    { name: 'Agents', icon: UserRound },
-    { name: 'Audit Logs', icon: Logs },
-    { name: 'Settings', icon: Settings },
+    { name: 'Dashboard', icon: LayoutGrid, enabled: false },
+    { name: 'Request', icon: UserSearch, enabled: false },
+    { name: 'Advanced Search', icon: Search, enabled: false },
+    { name: 'Search History', icon: History, enabled: true },
+    { name: 'Agents', icon: UserRound, enabled: false },
+    { name: 'Audit Logs', icon: Logs, enabled: false },
+    { name: 'Settings', icon: Settings, enabled: false },
   ];
 
   return (
@@ -86,29 +86,47 @@ export function Sidebar({
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeNavItem === item.name;
+              const isEnabled = item.enabled;
 
               return (
                 <button
                   key={item.name}
+                  disabled={!isEnabled}
                   onClick={() => {
-                    onSelectNav && onSelectNav(item.name);
-                    if (onCloseMobile) onCloseMobile();
+                    if (isEnabled) {
+                      onSelectNav && onSelectNav(item.name);
+                      if (onCloseMobile) onCloseMobile();
+                    }
                   }}
-                  className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[15px] font-medium transition-all duration-200 text-left cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-[15px] font-medium transition-all duration-200 text-left ${
                     isActive
                       ? 'bg-[#550000] text-white shadow-sm shadow-[#550000]/25'
-                      : 'text-[#3d2014] hover:text-[#23120b] hover:bg-[#ebdfd3]'
+                      : isEnabled
+                      ? 'text-[#3d2014] hover:text-[#23120b] hover:bg-[#ebdfd3] cursor-pointer'
+                      : 'text-stone-400/60 bg-transparent cursor-not-allowed opacity-40 select-none'
                   }`}
                 >
-                  <Icon
-                    className={`w-5 h-5 shrink-0 ${
-                      isActive ? 'text-white' : 'text-[#3d2014]'
-                    }`}
-                    strokeWidth={1.8}
-                  />
-                  <span className="font-sans font-medium tracking-wide">
-                    {item.name}
-                  </span>
+                  <div className="flex items-center gap-3.5">
+                    <Icon
+                      className={`w-5 h-5 shrink-0 ${
+                        isActive
+                          ? 'text-white'
+                          : isEnabled
+                          ? 'text-[#3d2014]'
+                          : 'text-stone-400/60'
+                      }`}
+                      strokeWidth={1.8}
+                    />
+                    <span className="font-sans font-medium tracking-wide">
+                      {item.name}
+                    </span>
+                  </div>
+
+                  {!isEnabled && (
+                    <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-stone-200/70 text-stone-500">
+                      Disabled
+                    </span>
+                  )}
                 </button>
               );
             })}
