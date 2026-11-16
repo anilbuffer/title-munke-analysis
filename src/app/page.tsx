@@ -70,7 +70,7 @@ export default function AISettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-[#291e1a] flex p-0 lg:p-4 font-sans">
+    <div className="min-h-screen bg-[#ffffff] text-[#291e1a] flex p-0 lg:p-4 font-sans">
       {/* Sidebar Navigation */}
       <Sidebar
         isMobileOpen={isMobileSidebarOpen}
@@ -81,7 +81,7 @@ export default function AISettingsPage() {
 
       {/* Main Workspace (Offset for fixed lg sidebar w-72 (288px) + ml-4 (16px) = 304px) */}
       <div className="flex-1 lg:pl-[304px] flex flex-col min-w-0 px-4 sm:px-6 py-4 lg:py-0">
-        
+
         {/* Top Header Card */}
         <div className="mb-5">
           <Header
@@ -92,12 +92,10 @@ export default function AISettingsPage() {
 
         {/* Main Content Area */}
         <main className="flex-1 pb-8">
-          
+
           {/* 1. SEARCH HISTORY VIEW (Matches User Attached Screenshots) */}
           {activeNav === 'Search History' && (
-            <div className="bg-[#f8f3ed] border border-[#eadfd4] rounded-3xl p-5 sm:p-6 lg:p-7 shadow-xs">
-              <SearchHistoryView onBack={() => setActiveNav('Dashboard')} />
-            </div>
+            <SearchHistoryView onBack={() => setActiveNav('Dashboard')} />
           )}
 
           {/* 2. SETTINGS VIEW */}
@@ -282,11 +280,10 @@ export default function AISettingsPage() {
                           <td className="py-3 font-medium">{item.address}</td>
                           <td className="py-3 text-stone-600">{item.type}</td>
                           <td className="py-3">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                              item.status === 'Clear' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${item.status === 'Clear' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
                               item.status === 'Completed' ? 'bg-stone-100 text-stone-700 border border-stone-200' :
-                              'bg-amber-50 text-amber-700 border border-amber-200'
-                            }`}>
+                                'bg-amber-50 text-amber-700 border border-amber-200'
+                              }`}>
                               {item.status}
                             </span>
                           </td>
@@ -337,20 +334,18 @@ export default function AISettingsPage() {
                           <td className="py-3.5 font-medium">{req.property}</td>
                           <td className="py-3.5 text-stone-600">{req.client}</td>
                           <td className="py-3.5">
-                            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-                              req.priority === 'Urgent' ? 'bg-red-50 text-red-700 border border-red-200' :
+                            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${req.priority === 'Urgent' ? 'bg-red-50 text-red-700 border border-red-200' :
                               req.priority === 'High' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
-                              'bg-stone-100 text-stone-700 border border-stone-200'
-                            }`}>
+                                'bg-stone-100 text-stone-700 border border-stone-200'
+                              }`}>
                               {req.priority}
                             </span>
                           </td>
                           <td className="py-3.5">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                              req.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${req.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
                               req.status === 'In Progress' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
-                              'bg-amber-50 text-amber-700 border border-amber-200'
-                            }`}>
+                                'bg-amber-50 text-amber-700 border border-amber-200'
+                              }`}>
                               {req.status}
                             </span>
                           </td>

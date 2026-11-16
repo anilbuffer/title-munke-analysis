@@ -20,7 +20,7 @@ export default function SearchHistoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-[#291e1a] flex p-0 lg:p-4 font-sans">
+    <div className="min-h-screen bg-[#ffffff] text-[#291e1a] flex p-0 lg:p-4 font-sans">
       {/* Sidebar Navigation */}
       <Sidebar
         isMobileOpen={isMobileSidebarOpen}
@@ -41,9 +41,7 @@ export default function SearchHistoryPage() {
 
         {/* Main Content Area */}
         <main className="flex-1 pb-8">
-          <div className="bg-[#f8f3ed] border border-[#eadfd4] rounded-3xl p-5 sm:p-6 lg:p-7 shadow-xs">
-            <SearchHistoryView onBack={() => router.push('/')} />
-          </div>
+          <SearchHistoryView onBack={() => router.push('/')} />
         </main>
       </div>
     </div>

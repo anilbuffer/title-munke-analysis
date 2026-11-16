@@ -5,7 +5,6 @@ import {
   ChevronLeft,
   ChevronsUpDown,
   ChevronDown,
-  ChevronUp,
   Link2,
   Download,
   Eye,
@@ -13,10 +12,7 @@ import {
   Search,
   X,
   CheckCircle2,
-  FileText,
-  Building,
   Bot,
-  MessageSquare,
 } from 'lucide-react';
 import {
   PENNSYLVANIA_SEARCH_HISTORY,
@@ -24,6 +20,7 @@ import {
   SearchHistoryItem,
 } from '@/data/mock-search-history';
 import { NYPropertyDetailView } from './NYPropertyDetailView';
+import { PAPropertyDetailView } from './PAPropertyDetailView';
 
 interface SearchHistoryViewProps {
   onBack?: () => void;
@@ -33,13 +30,23 @@ interface SearchHistoryViewProps {
 export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: SearchHistoryViewProps) {
   const [activeTab, setActiveTab] = useState<'Pennsylvania' | 'New York'>(defaultTab);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRecord, setSelectedRecord] = useState<SearchHistoryItem | null>(null);
+  const [viewingPAProperty, setViewingPAProperty] = useState<string | null>(null);
   const [viewingNYProperty, setViewingNYProperty] = useState<string | null>(null);
   const [sortField, setSortField] = useState<'srNo' | 'address' | 'dateTime' | 'status'>('srNo');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // If viewing detailed NY property page
+  // If viewing detailed Pennsylvania property page (FULL PAGE, NOT A MODAL)
+  if (viewingPAProperty) {
+    return (
+      <PAPropertyDetailView
+        onBack={() => setViewingPAProperty(null)}
+        propertyAddress={viewingPAProperty}
+      />
+    );
+  }
+
+  // If viewing detailed New York property page (FULL PAGE, NOT A MODAL)
   if (viewingNYProperty) {
     return (
       <NYPropertyDetailView
@@ -102,6 +109,14 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
     }, 3500);
   };
 
+  const handleViewRecord = (record: SearchHistoryItem) => {
+    if (activeTab === 'Pennsylvania') {
+      setViewingPAProperty(record.address);
+    } else {
+      setViewingNYProperty(record.address);
+    }
+  };
+
   return (
     <div className="relative animate-in fade-in duration-300">
       {/* Toast Notification */}
@@ -112,11 +127,11 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
         </div>
       )}
 
-      {/* Top: Back Navigation */}
-      <div className="mb-4">
+      {/* Top: Back Navigation Banner */}
+      <div className="bg-[#ede4db] rounded-2xl px-5 py-3 mb-5 flex items-center border border-[#e2d7cc] shadow-2xs">
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors cursor-pointer group"
+          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors cursor-pointer group"
         >
           <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
           <span>Back</span>
@@ -166,7 +181,7 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 cursor-pointer"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -279,14 +294,10 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
                       {row.srNo}
                     </td>
 
-                    {/* Address */}
+                    {/* Address - Click opens Full Page Detail View */}
                     <td
-                      onClick={() => {
-                        if (activeTab === 'New York') setViewingNYProperty(row.address);
-                      }}
-                      className={`py-4 px-4 sm:px-6 text-xs sm:text-[13px] font-normal tracking-tight text-[#3d2014] ${
-                        activeTab === 'New York' ? 'cursor-pointer hover:text-[#550000] hover:underline' : ''
-                      }`}
+                      onClick={() => handleViewRecord(row)}
+                      className="py-4 px-4 sm:px-6 text-xs sm:text-[13px] font-normal tracking-tight text-[#3d2014] cursor-pointer hover:text-[#550000] hover:underline"
                     >
                       {row.address}
                     </td>
@@ -331,18 +342,12 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
                       )}
                     </td>
 
-                    {/* Action */}
+                    {/* Action - Eye icon opens Full Page Detail View (NOT A MODAL) */}
                     <td className="py-4 px-4 sm:px-6 whitespace-nowrap text-center">
                       <button
-                        onClick={() => {
-                          if (activeTab === 'New York') {
-                            setViewingNYProperty(row.address);
-                          } else {
-                            setSelectedRecord(row);
-                          }
-                        }}
+                        onClick={() => handleViewRecord(row)}
                         className="p-1 rounded-md text-[#3d2014] hover:text-[#550000] hover:bg-stone-100 transition-colors cursor-pointer inline-flex items-center justify-center"
-                        title={activeTab === 'New York' ? 'View ACRIS Records & Property Specs' : 'View Property Abstract'}
+                        title={activeTab === 'New York' ? 'View ACRIS Records & Property Specs' : 'View Pennsylvania Property & Recorded Deeds'}
                       >
                         <Eye className="w-4 h-4" />
                       </button>
@@ -375,99 +380,6 @@ export function SearchHistoryView({ onBack, defaultTab = 'Pennsylvania' }: Searc
           <Bot className="w-6 h-6" />
         </button>
       </div>
-
-      {/* Record Preview Modal (Opened by Eye icon) */}
-      {selectedRecord && (
-        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl border border-[#eadfd4] shadow-xl max-w-lg w-full p-6 space-y-4 animate-in zoom-in-95">
-            <div className="flex items-start justify-between border-b border-stone-100 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#f8f3ed] flex items-center justify-center text-[#550000]">
-                  <Building className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-[#3d2014]">Property Title Abstract</h3>
-                  <p className="text-xs text-stone-500">Search Record #{selectedRecord.srNo} &bull; {activeTab}</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setSelectedRecord(null)}
-                className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs sm:text-sm">
-              <div className="bg-[#f8f3ed] rounded-2xl p-4 space-y-2 border border-[#eadfd4]">
-                <div>
-                  <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wide block">Address</span>
-                  <p className="font-semibold text-[#3d2014] text-sm mt-0.5">{selectedRecord.address}</p>
-                </div>
-                {selectedRecord.borough && (
-                  <div>
-                    <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wide block">Borough</span>
-                    <p className="font-medium text-stone-800">{selectedRecord.borough}</p>
-                  </div>
-                )}
-                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-[#eadfd4]">
-                  <div>
-                    <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wide block">Timestamp</span>
-                    <p className="font-medium text-stone-800">{selectedRecord.dateTime}</p>
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wide block">Verification Status</span>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-[#eaf4ec] text-[#2d7a3e]">
-                      {selectedRecord.status}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-stone-200 p-3.5 space-y-2">
-                <span className="text-xs font-bold text-[#3d2014] block">Included Search Documents:</span>
-                <ul className="space-y-1.5 text-xs text-stone-600">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>Warranty Deed & Chain of Conveyance</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>Mortgage Filings & Satisfaction Certificates</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>County Tax Assessor & Transfer Tax Stamps (TP-584/RPTT)</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>Municipal Lien & Judgment Search Certificate</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-2.5 pt-2">
-              <button
-                onClick={() => setSelectedRecord(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-100 cursor-pointer"
-              >
-                Close
-              </button>
-              <button
-                onClick={() => {
-                  handleDownload(selectedRecord);
-                  setSelectedRecord(null);
-                }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#550000] text-white text-xs font-semibold hover:bg-[#6b0000] shadow-xs cursor-pointer"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download Title Package</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
