@@ -1,3 +1,59 @@
+export interface PAPropertyDetails {
+  title: string;
+  searchedOn: string;
+  searchId: string;
+  status: 'SUCCESS';
+  location: string;
+  lots: string;
+  area: string;
+  property: string;
+  countyState: string;
+  municipality: string;
+  pinParcel: string;
+  spanOfSearch: string;
+  dateOfSearch: string;
+  currentOwner: string;
+  taxAssessment: string;
+  titleDeed: string;
+}
+
+export interface PADocumentItem {
+  srNo: number;
+  documentType: string;
+  dateRecorded: string;
+}
+
+export const MOCK_PA_PROPERTY_EXACT: PAPropertyDetails = {
+  title: '6432 SCHOLLER RD, Lynn Township, PA, Lehigh County, Pennsylvania',
+  searchedOn: 'November 12, 2026',
+  searchId: 'c9c11275-7eb5-4a8d-94b8-52896d236472',
+  status: 'SUCCESS',
+  location: '6432 Scholler Rd, Kempton, Pennsylvania 19529',
+  lots: '#91 (W 34 ft), #92 (all)',
+  area: 'Allentown, Lehigh County',
+  property: '6432 SCHOLLER RD, Lynn Township, PA',
+  countyState: 'Lehigh County, Pennsylvania',
+  municipality: 'Township of Lynn',
+  pinParcel: '541808671290',
+  spanOfSearch: '60 years',
+  dateOfSearch: 'November 12, 2026',
+  currentOwner: 'Jacob Singmaster',
+  taxAssessment: '$289400',
+  titleDeed:
+    'Special Warranty Deed recorded on 05/13/2003 at 10:56:00 AM, Document ID 7085694',
+};
+
+export const MOCK_PA_DOCUMENTS_EXACT: PADocumentItem[] = [
+  { srNo: 1, documentType: 'DOCUMENT 1', dateRecorded: '05/25/2010' },
+  { srNo: 2, documentType: 'DOCUMENT 2', dateRecorded: '02/26/2013' },
+  { srNo: 3, documentType: 'DOCUMENT 3', dateRecorded: '08/14/2015' },
+  { srNo: 4, documentType: 'DOCUMENT 4', dateRecorded: '11/02/2018' },
+  { srNo: 5, documentType: 'DOCUMENT 5', dateRecorded: '04/19/2021' },
+  { srNo: 6, documentType: 'DOCUMENT 6', dateRecorded: '09/30/2023' },
+  { srNo: 7, documentType: 'DOCUMENT 7', dateRecorded: '11/12/2026' },
+];
+
+// Backward-compatible exports
 export interface PAPropertyOverview {
   address: string;
   subAddress: string;
@@ -34,22 +90,22 @@ export const MOCK_PA_PROPERTY_6432_SCHOLLER: PAPropertyOverview = {
   address: '6432 SCHOLLER RD, Lynn Township, PA',
   subAddress: '6432 Scholler Rd, New Tripoli, PA 18066',
   countyMunicipality: 'Lehigh County / Lynn Township',
-  parcelPin: '5418-47-2849-1',
+  parcelPin: '541808671290',
   landUseCode: '110 - Single Family Residential',
   acreage: '12.45 Acres',
   yearBuilt: '1988',
   livingArea: '3,420 sq ft',
   totalRooms: '9 (4 Beds / 3 Baths)',
   zoning: 'A - Agricultural Preservation',
-  taxAssessment: '$348,500',
+  taxAssessment: '$289400',
   cleanAndGreen: 'Enrolled (Act 319)',
   schoolDistrict: 'Northwestern Lehigh',
-  recordedOwner: 'Scholler Homestead Trust',
+  recordedOwner: 'Jacob Singmaster',
   status: 'SUCCESS',
   totalDocuments: 14,
   lastDocumentRecorded: '11/12/2026 12:15 PM',
   legalDescription:
-    'All that certain tract or piece of land situate in the Township of Lynn, County of Lehigh, Commonwealth of Pennsylvania, bounded and described according to a survey and plan thereof made by Lehigh County GIS & Assessment Division, Parcel ID 5418-47-2849-1.',
+    'All that certain tract or piece of land situate in the Township of Lynn, County of Lehigh, Commonwealth of Pennsylvania, bounded and described according to a survey and plan thereof made by Lehigh County GIS & Assessment Division, Parcel ID 541808671290.',
   photoUrl:
     'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80',
   mapParcelUrl:
@@ -59,101 +115,51 @@ export const MOCK_PA_PROPERTY_6432_SCHOLLER: PAPropertyOverview = {
 export const MOCK_PA_DOCUMENT_TRANSACTIONS: PADocumentTransaction[] = [
   {
     id: 'PA-TX-01',
-    documentId: '20260008492',
-    recordedDate: '11/12/2026 12:15 PM',
+    documentId: 'DOCUMENT 1',
+    recordedDate: '05/25/2010',
     docType: 'Deed / Special Warranty',
     action: 'View',
   },
   {
     id: 'PA-TX-02',
-    documentId: '20260007321',
-    recordedDate: '11/11/2026 04:27 PM',
+    documentId: 'DOCUMENT 2',
+    recordedDate: '02/26/2013',
     docType: 'Mortgage / Fulton Bank',
     action: 'View',
   },
   {
     id: 'PA-TX-03',
-    documentId: '20260006894',
-    recordedDate: '11/11/2026 01:00 PM',
+    documentId: 'DOCUMENT 3',
+    recordedDate: '08/14/2015',
     docType: 'Satisfaction of Mortgage',
     action: 'View',
   },
   {
     id: 'PA-TX-04',
-    documentId: '20260005118',
-    recordedDate: '11/11/2026 11:52 AM',
+    documentId: 'DOCUMENT 4',
+    recordedDate: '11/02/2018',
     docType: 'Agricultural Conservation Easement',
     action: 'View',
   },
   {
     id: 'PA-TX-05',
-    documentId: '20260004920',
-    recordedDate: '11/11/2026 11:26 AM',
+    documentId: 'DOCUMENT 5',
+    recordedDate: '04/19/2021',
     docType: 'Right of Way Agreement',
     action: 'View',
   },
   {
     id: 'PA-TX-06',
-    documentId: '20260003841',
-    recordedDate: '11/11/2026 10:21 AM',
+    documentId: 'DOCUMENT 6',
+    recordedDate: '09/30/2023',
     docType: 'Release of Encumbrance',
     action: 'View',
   },
   {
     id: 'PA-TX-07',
-    documentId: '20260002955',
-    recordedDate: '11/06/2026 03:09 PM',
-    docType: 'Assignment of Leases & Rents',
+    documentId: 'DOCUMENT 7',
+    recordedDate: '11/12/2026',
+    docType: 'Title Certification',
     action: 'View',
-  },
-  {
-    id: 'PA-TX-08',
-    documentId: '20260002104',
-    recordedDate: '11/06/2026 12:33 PM',
-    docType: 'Mortgage Modification Agreement',
-    action: 'View',
-  },
-  {
-    id: 'PA-TX-09',
-    documentId: '20260001889',
-    recordedDate: '11/06/2026 12:27 PM',
-    docType: 'Satisfaction of Prior Lien',
-    action: 'View',
-  },
-  {
-    id: 'PA-TX-10',
-    documentId: '20260001402',
-    recordedDate: '11/05/2026 07:02 PM',
-    docType: 'Clean and Green Act Covenant (Act 319)',
-    action: 'View',
-  },
-  {
-    id: 'PA-TX-11',
-    documentId: '20260000918',
-    recordedDate: '11/05/2026 05:59 PM',
-    docType: 'Boundary Line Agreement',
-    action: 'View',
-  },
-  {
-    id: 'PA-TX-12',
-    documentId: '20260000441',
-    recordedDate: '11/04/2026 04:05 PM',
-    docType: 'Subordination Agreement',
-    action: 'View',
-  },
-  {
-    id: 'PA-TX-13',
-    documentId: '20260000120',
-    recordedDate: '11/03/2026 10:21 AM',
-    docType: 'Quitclaim Deed',
-    action: 'View',
-  },
-  {
-    id: 'PA-TX-14',
-    documentId: '19940003189',
-    recordedDate: '10/14/1994 10:32 AM',
-    docType: 'Original Homestead Deed & Grant',
-    action: 'View',
-    highlighted: true,
   },
 ];
