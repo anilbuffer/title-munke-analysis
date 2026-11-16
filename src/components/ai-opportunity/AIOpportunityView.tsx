@@ -205,10 +205,6 @@ export function AIOpportunityView({
               <h1 className="text-xl sm:text-2xl font-bold text-[#291e1a] tracking-tight">
                 Property Finder
               </h1>
-              {/* Green Badge matching Image 1 */}
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-[#eaf4ec] text-[#2d7a3e]">
-                Historical sales data
-              </span>
             </div>
           </div>
           <p className="text-xs sm:text-sm text-stone-500">

@@ -103,18 +103,16 @@ export function Sidebar({
                       if (onCloseMobile) onCloseMobile();
                     }
                   }}
-                  className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[15px] font-medium transition-all duration-200 text-left select-none ${
-                    isActive
-                      ? 'bg-[#550000] text-white shadow-sm shadow-[#550000]/25 cursor-pointer'
-                      : isClickable
+                  className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[15px] font-medium transition-all duration-200 text-left select-none ${isActive
+                    ? 'bg-[#550000] text-white shadow-sm shadow-[#550000]/25 cursor-pointer'
+                    : isClickable
                       ? 'text-[#3d2014] hover:text-[#23120b] hover:bg-[#ebdfd3] cursor-pointer'
                       : 'text-[#3d2014] cursor-default'
-                  }`}
+                    }`}
                 >
                   <Icon
-                    className={`w-5 h-5 shrink-0 ${
-                      isActive ? 'text-white' : 'text-[#3d2014]'
-                    }`}
+                    className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-[#3d2014]'
+                      }`}
                     strokeWidth={1.8}
                   />
                   <span className="font-sans font-medium tracking-wide">
